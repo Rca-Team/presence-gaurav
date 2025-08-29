@@ -58,6 +58,33 @@ export type Database = {
           },
         ]
       }
+      attendance_records: {
+        Row: {
+          created_at: string
+          device_info: Json
+          id: string
+          timestamp: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          device_info?: Json
+          id?: string
+          timestamp?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          device_info?: Json
+          id?: string
+          timestamp?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       desk_detections: {
         Row: {
           confidence_scores: Json | null
@@ -245,11 +272,18 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          department: string | null
           display_name: string | null
+          emergency_contact: string | null
+          employee_id: string | null
           grade_level: string | null
           id: string
           learning_preferences: Json | null
+          parent_email: string | null
+          parent_name: string | null
+          parent_phone: string | null
           privacy_settings: Json | null
+          relationship: string | null
           subjects: string[] | null
           updated_at: string
           user_id: string
@@ -257,11 +291,18 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          department?: string | null
           display_name?: string | null
+          emergency_contact?: string | null
+          employee_id?: string | null
           grade_level?: string | null
           id?: string
           learning_preferences?: Json | null
+          parent_email?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
           privacy_settings?: Json | null
+          relationship?: string | null
           subjects?: string[] | null
           updated_at?: string
           user_id: string
@@ -269,11 +310,18 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           created_at?: string
+          department?: string | null
           display_name?: string | null
+          emergency_contact?: string | null
+          employee_id?: string | null
           grade_level?: string | null
           id?: string
           learning_preferences?: Json | null
+          parent_email?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
           privacy_settings?: Json | null
+          relationship?: string | null
           subjects?: string[] | null
           updated_at?: string
           user_id?: string
