@@ -70,10 +70,10 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
     try {
       setIsLoading(true);
       
-      // Optimize query to reduce payload
+      // Optimize query to reduce payload - include image_url
       const { data: registrationRecords, error } = await supabase
         .from('attendance_records')
-        .select('id, device_info, timestamp')
+        .select('id, device_info, timestamp, image_url')
         .contains('device_info', { registration: true })
         .order('timestamp', { ascending: false });
 
@@ -92,7 +92,7 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
                 employee_id: metadata.employee_id || 'N/A',
                 department: metadata.department || 'N/A',
                 position: metadata.position || 'Student',
-                image_url: metadata.firebase_image_url || '',
+                image_url: (record as any).image_url || metadata.firebase_image_url || metadata.image || '',
                 total_attendance: 0,
                 last_attendance: record.timestamp || 'Never'
               };
