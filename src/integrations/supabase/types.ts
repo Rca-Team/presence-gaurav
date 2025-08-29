@@ -60,25 +60,40 @@ export type Database = {
       }
       attendance_records: {
         Row: {
+          confidence: number | null
           created_at: string
           device_info: Json
+          face_descriptor: string | null
           id: string
+          image_url: string | null
+          metadata: Json | null
+          status: string | null
           timestamp: string
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          confidence?: number | null
           created_at?: string
           device_info?: Json
+          face_descriptor?: string | null
           id?: string
+          image_url?: string | null
+          metadata?: Json | null
+          status?: string | null
           timestamp?: string
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          confidence?: number | null
           created_at?: string
           device_info?: Json
+          face_descriptor?: string | null
           id?: string
+          image_url?: string | null
+          metadata?: Json | null
+          status?: string | null
           timestamp?: string
           updated_at?: string
           user_id?: string | null
