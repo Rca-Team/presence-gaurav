@@ -10,314 +10,367 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
-      attendance_records: {
+      ar_interactions: {
         Row: {
-          confidence_score: number | null
-          created_at: string
-          device_info: Json | null
+          content_title: string
+          content_type: string
+          helpful_rating: number | null
           id: string
-          image_url: string | null
-          status: string
+          interaction_duration: number | null
+          session_id: string
+          textbook_page: string | null
           timestamp: string
-          updated_at: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
-          confidence_score?: number | null
-          created_at?: string
-          device_info?: Json | null
+          content_title: string
+          content_type: string
+          helpful_rating?: number | null
           id?: string
-          image_url?: string | null
-          status?: string
+          interaction_duration?: number | null
+          session_id: string
+          textbook_page?: string | null
           timestamp?: string
-          updated_at?: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
-          confidence_score?: number | null
-          created_at?: string
-          device_info?: Json | null
+          content_title?: string
+          content_type?: string
+          helpful_rating?: number | null
           id?: string
-          image_url?: string | null
-          status?: string
+          interaction_duration?: number | null
+          session_id?: string
+          textbook_page?: string | null
           timestamp?: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      attendance_settings: {
-        Row: {
-          created_at: string
-          id: string
-          key: string
-          updated_at: string
-          value: Json | null
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          key: string
-          updated_at?: string
-          value?: Json | null
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          key?: string
-          updated_at?: string
-          value?: Json | null
-        }
-        Relationships: []
-      }
-      camera_sources: {
-        Row: {
-          created_at: string
-          id: string
-          is_active: boolean | null
-          location: string | null
-          name: string
-          orientation: string | null
-          rtsp_url: string | null
-          settings: Json | null
-          source_type: string
-          source_url: string | null
-          speed_limit: number | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_active?: boolean | null
-          location?: string | null
-          name: string
-          orientation?: string | null
-          rtsp_url?: string | null
-          settings?: Json | null
-          source_type: string
-          source_url?: string | null
-          speed_limit?: number | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_active?: boolean | null
-          location?: string | null
-          name?: string
-          orientation?: string | null
-          rtsp_url?: string | null
-          settings?: Json | null
-          source_type?: string
-          source_url?: string | null
-          speed_limit?: number | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      detection_sessions: {
-        Row: {
-          camera_source: string | null
-          created_at: string
-          end_time: string | null
-          id: string
-          session_name: string
-          settings: Json | null
-          start_time: string
-          status: string | null
-          updated_at: string
-          violations_count: number | null
-        }
-        Insert: {
-          camera_source?: string | null
-          created_at?: string
-          end_time?: string | null
-          id?: string
-          session_name: string
-          settings?: Json | null
-          start_time?: string
-          status?: string | null
-          updated_at?: string
-          violations_count?: number | null
-        }
-        Update: {
-          camera_source?: string | null
-          created_at?: string
-          end_time?: string | null
-          id?: string
-          session_name?: string
-          settings?: Json | null
-          start_time?: string
-          status?: string | null
-          updated_at?: string
-          violations_count?: number | null
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          address: string | null
-          avatar_url: string | null
-          created_at: string
-          display_name: string | null
-          emergency_contact: string | null
-          id: string
-          parent_email: string | null
-          parent_name: string | null
-          parent_phone: string | null
-          relationship: string | null
-          updated_at: string
-          user_id: string | null
-          username: string | null
-        }
-        Insert: {
-          address?: string | null
-          avatar_url?: string | null
-          created_at?: string
-          display_name?: string | null
-          emergency_contact?: string | null
-          id?: string
-          parent_email?: string | null
-          parent_name?: string | null
-          parent_phone?: string | null
-          relationship?: string | null
-          updated_at?: string
-          user_id?: string | null
-          username?: string | null
-        }
-        Update: {
-          address?: string | null
-          avatar_url?: string | null
-          created_at?: string
-          display_name?: string | null
-          emergency_contact?: string | null
-          id?: string
-          parent_email?: string | null
-          parent_name?: string | null
-          parent_phone?: string | null
-          relationship?: string | null
-          updated_at?: string
-          user_id?: string | null
-          username?: string | null
-        }
-        Relationships: []
-      }
-      system_settings: {
-        Row: {
-          created_at: string
-          id: string
-          key: string
-          updated_at: string
-          value: Json
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          key: string
-          updated_at?: string
-          value: Json
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          key?: string
-          updated_at?: string
-          value?: Json
-        }
-        Relationships: []
-      }
-      users: {
-        Row: {
-          created_at: string
-          email: string
-          id: string
-          role: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          email: string
-          id?: string
-          role?: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          email?: string
-          id?: string
-          role?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      violations: {
-        Row: {
-          additional_data: Json | null
-          camera_id: string | null
-          clip_url: string | null
-          confidence_score: number | null
-          created_at: string
-          id: string
-          image_url: string | null
-          location_data: Json | null
-          metadata: Json | null
-          speed: number | null
-          status: string | null
-          thumb_url: string | null
-          timestamp: string
-          updated_at: string
-          vehicle_plate: string | null
-          vehicle_type: string | null
-          violation_type: string
-        }
-        Insert: {
-          additional_data?: Json | null
-          camera_id?: string | null
-          clip_url?: string | null
-          confidence_score?: number | null
-          created_at?: string
-          id?: string
-          image_url?: string | null
-          location_data?: Json | null
-          metadata?: Json | null
-          speed?: number | null
-          status?: string | null
-          thumb_url?: string | null
-          timestamp?: string
-          updated_at?: string
-          vehicle_plate?: string | null
-          vehicle_type?: string | null
-          violation_type: string
-        }
-        Update: {
-          additional_data?: Json | null
-          camera_id?: string | null
-          clip_url?: string | null
-          confidence_score?: number | null
-          created_at?: string
-          id?: string
-          image_url?: string | null
-          location_data?: Json | null
-          metadata?: Json | null
-          speed?: number | null
-          status?: string | null
-          thumb_url?: string | null
-          timestamp?: string
-          updated_at?: string
-          vehicle_plate?: string | null
-          vehicle_type?: string | null
-          violation_type?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "violations_camera_id_fkey"
-            columns: ["camera_id"]
+            foreignKeyName: "ar_interactions_session_id_fkey"
+            columns: ["session_id"]
             isOneToOne: false
-            referencedRelation: "camera_sources"
+            referencedRelation: "study_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      desk_detections: {
+        Row: {
+          confidence_scores: Json | null
+          distraction_objects: string[] | null
+          id: string
+          objects_detected: string[] | null
+          session_id: string
+          study_posture_valid: boolean | null
+          timestamp: string
+          user_id: string
+          warning_triggered: boolean | null
+          warning_type: string | null
+        }
+        Insert: {
+          confidence_scores?: Json | null
+          distraction_objects?: string[] | null
+          id?: string
+          objects_detected?: string[] | null
+          session_id: string
+          study_posture_valid?: boolean | null
+          timestamp?: string
+          user_id: string
+          warning_triggered?: boolean | null
+          warning_type?: string | null
+        }
+        Update: {
+          confidence_scores?: Json | null
+          distraction_objects?: string[] | null
+          id?: string
+          objects_detected?: string[] | null
+          session_id?: string
+          study_posture_valid?: boolean | null
+          timestamp?: string
+          user_id?: string
+          warning_triggered?: boolean | null
+          warning_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "desk_detections_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "study_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      emotion_detections: {
+        Row: {
+          confidence: number
+          emotion: string
+          focus_level: number | null
+          id: string
+          looking_at_book: boolean | null
+          metadata: Json | null
+          posture_score: number | null
+          session_id: string
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          confidence: number
+          emotion: string
+          focus_level?: number | null
+          id?: string
+          looking_at_book?: boolean | null
+          metadata?: Json | null
+          posture_score?: number | null
+          session_id: string
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          confidence?: number
+          emotion?: string
+          focus_level?: number | null
+          id?: string
+          looking_at_book?: boolean | null
+          metadata?: Json | null
+          posture_score?: number | null
+          session_id?: string
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emotion_detections_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "study_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      learning_streaks: {
+        Row: {
+          best_count: number
+          created_at: string
+          current_count: number
+          id: string
+          last_activity_date: string
+          metadata: Json | null
+          streak_active: boolean
+          streak_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_count?: number
+          created_at?: string
+          current_count?: number
+          id?: string
+          last_activity_date?: string
+          metadata?: Json | null
+          streak_active?: boolean
+          streak_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_count?: number
+          created_at?: string
+          current_count?: number
+          id?: string
+          last_activity_date?: string
+          metadata?: Json | null
+          streak_active?: boolean
+          streak_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      note_analyses: {
+        Row: {
+          clarity_score: number | null
+          diagrams_suggested: string[] | null
+          extracted_text: string | null
+          id: string
+          image_url: string | null
+          missing_keywords: string[] | null
+          session_id: string
+          subject_detected: string | null
+          suggested_improvements: string[] | null
+          timestamp: string
+          user_id: string
+        }
+        Insert: {
+          clarity_score?: number | null
+          diagrams_suggested?: string[] | null
+          extracted_text?: string | null
+          id?: string
+          image_url?: string | null
+          missing_keywords?: string[] | null
+          session_id: string
+          subject_detected?: string | null
+          suggested_improvements?: string[] | null
+          timestamp?: string
+          user_id: string
+        }
+        Update: {
+          clarity_score?: number | null
+          diagrams_suggested?: string[] | null
+          extracted_text?: string | null
+          id?: string
+          image_url?: string | null
+          missing_keywords?: string[] | null
+          session_id?: string
+          subject_detected?: string | null
+          suggested_improvements?: string[] | null
+          timestamp?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "note_analyses_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "study_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          grade_level: string | null
+          id: string
+          learning_preferences: Json | null
+          privacy_settings: Json | null
+          subjects: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          grade_level?: string | null
+          id?: string
+          learning_preferences?: Json | null
+          privacy_settings?: Json | null
+          subjects?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          grade_level?: string | null
+          id?: string
+          learning_preferences?: Json | null
+          privacy_settings?: Json | null
+          subjects?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      study_sessions: {
+        Row: {
+          ar_interactions: number | null
+          created_at: string
+          distraction_count: number | null
+          duration_minutes: number | null
+          emotion_summary: Json | null
+          end_time: string | null
+          focus_score: number | null
+          id: string
+          notes_analyzed: number | null
+          session_metadata: Json | null
+          start_time: string
+          subject: string
+          topic: string | null
+          user_id: string
+        }
+        Insert: {
+          ar_interactions?: number | null
+          created_at?: string
+          distraction_count?: number | null
+          duration_minutes?: number | null
+          emotion_summary?: Json | null
+          end_time?: string | null
+          focus_score?: number | null
+          id?: string
+          notes_analyzed?: number | null
+          session_metadata?: Json | null
+          start_time?: string
+          subject: string
+          topic?: string | null
+          user_id: string
+        }
+        Update: {
+          ar_interactions?: number | null
+          created_at?: string
+          distraction_count?: number | null
+          duration_minutes?: number | null
+          emotion_summary?: Json | null
+          end_time?: string | null
+          focus_score?: number | null
+          id?: string
+          notes_analyzed?: number | null
+          session_metadata?: Json | null
+          start_time?: string
+          subject?: string
+          topic?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      voice_interactions: {
+        Row: {
+          ai_response: string | null
+          id: string
+          interaction_type: string
+          processing_time_ms: number | null
+          session_id: string
+          timestamp: string
+          transcript: string
+          user_id: string
+          voice_used: string | null
+        }
+        Insert: {
+          ai_response?: string | null
+          id?: string
+          interaction_type: string
+          processing_time_ms?: number | null
+          session_id: string
+          timestamp?: string
+          transcript: string
+          user_id: string
+          voice_used?: string | null
+        }
+        Update: {
+          ai_response?: string | null
+          id?: string
+          interaction_type?: string
+          processing_time_ms?: number | null
+          session_id?: string
+          timestamp?: string
+          transcript?: string
+          user_id?: string
+          voice_used?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voice_interactions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "study_sessions"
             referencedColumns: ["id"]
           },
         ]
@@ -327,22 +380,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_dashboard_summary: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
-      get_user_role: {
-        Args: { user_uuid: string }
-        Returns: string
-      }
-      increment_session_violations: {
-        Args: { session_id: string }
-        Returns: undefined
-      }
-      test_camera_connection: {
-        Args: { camera_id: string }
-        Returns: Json
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
