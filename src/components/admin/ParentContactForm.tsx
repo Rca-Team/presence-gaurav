@@ -54,7 +54,7 @@ const ParentContactForm: React.FC<ParentContactFormProps> = ({
       const { error } = await supabase
         .from('profiles')
         .upsert({
-          id: studentId,
+          user_id: studentId,  // Add required user_id field
           parent_name: data.parentName,
           parent_email: data.parentEmail,
           parent_phone: data.parentPhone,

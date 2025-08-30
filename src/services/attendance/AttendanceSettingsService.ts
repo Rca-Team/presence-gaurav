@@ -23,9 +23,9 @@ export const getCutoffTime = async (): Promise<string> => {
     }
 
     if (data && data.value) {
-      // Make sure to handle the type properly
-      const value = data.value as { time: string };
-      return value.time || '09:00';
+      // Handle the value as a string (since it's stored as TEXT in the database)
+      const value = data.value;
+      return typeof value === 'string' ? value : '09:00';
     }
 
     return '09:00'; // Default cutoff time if no data
@@ -55,7 +55,7 @@ export const updateCutoffTime = async (time: string): Promise<boolean> => {
     if (data) {
       const { error: updateError } = await supabase
         .from('attendance_settings')
-        .update({ value: { time } })
+        .update({ value: time })  // Store as string directly
         .eq('id', data.id);
 
       if (updateError) {
@@ -65,7 +65,7 @@ export const updateCutoffTime = async (time: string): Promise<boolean> => {
     } else {
       const { error: insertError } = await supabase
         .from('attendance_settings')
-        .insert({ key: 'cutoff_time', value: { time } });
+        .insert({ key: 'cutoff_time', value: time });  // Store as string directly
 
       if (insertError) {
         console.error('Error inserting cutoff time:', insertError);
