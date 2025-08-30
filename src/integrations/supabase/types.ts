@@ -61,6 +61,7 @@ export type Database = {
       attendance_records: {
         Row: {
           confidence: number | null
+          confidence_score: number | null
           created_at: string
           device_info: Json
           face_descriptor: string | null
@@ -74,6 +75,7 @@ export type Database = {
         }
         Insert: {
           confidence?: number | null
+          confidence_score?: number | null
           created_at?: string
           device_info?: Json
           face_descriptor?: string | null
@@ -87,6 +89,7 @@ export type Database = {
         }
         Update: {
           confidence?: number | null
+          confidence_score?: number | null
           created_at?: string
           device_info?: Json
           face_descriptor?: string | null
@@ -97,6 +100,30 @@ export type Database = {
           timestamp?: string
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      attendance_settings: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: string
         }
         Relationships: []
       }
@@ -285,6 +312,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
           avatar_url: string | null
           created_at: string
           department: string | null
@@ -302,8 +330,10 @@ export type Database = {
           subjects: string[] | null
           updated_at: string
           user_id: string
+          username: string | null
         }
         Insert: {
+          address?: string | null
           avatar_url?: string | null
           created_at?: string
           department?: string | null
@@ -321,8 +351,10 @@ export type Database = {
           subjects?: string[] | null
           updated_at?: string
           user_id: string
+          username?: string | null
         }
         Update: {
+          address?: string | null
           avatar_url?: string | null
           created_at?: string
           department?: string | null
@@ -340,6 +372,7 @@ export type Database = {
           subjects?: string[] | null
           updated_at?: string
           user_id?: string
+          username?: string | null
         }
         Relationships: []
       }

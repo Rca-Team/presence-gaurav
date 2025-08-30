@@ -293,23 +293,26 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
               onClick={() => setSelectedFaceId(face.id === selectedFaceId ? null : face.id)}
             >
               <CardContent className="p-0">
-                <div className="relative">
-                  <div className="aspect-[4/3] bg-muted flex items-center justify-center">
-                    {face.image_url ? (
-                      <img 
-                        src={face.image_url} 
-                        alt={face.name} 
-                        className="object-cover w-full h-full"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${face.name}&background=random`;
-                        }}
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center w-full h-full">
-                        <User className="h-24 w-24 text-muted-foreground/40" />
-                      </div>
-                    )}
-                  </div>
+                 <div className="relative">
+                   <div className="aspect-[4/3] bg-muted flex items-center justify-center">
+                     {face.image_url ? (
+                       <img 
+                         src={face.image_url.startsWith('data:') 
+                           ? face.image_url 
+                           : `https://zovwmlqnrsionbolcpng.supabase.co/storage/v1/object/public/face-images/${face.image_url}`
+                         } 
+                         alt={face.name} 
+                         className="object-cover w-full h-full"
+                         onError={(e) => {
+                           (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(face.name)}&background=random&size=200`;
+                         }}
+                       />
+                     ) : (
+                       <div className="flex items-center justify-center w-full h-full">
+                         <User className="h-24 w-24 text-muted-foreground/40" />
+                       </div>
+                     )}
+                   </div>
                   <div className="absolute top-2 right-2">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -387,22 +390,25 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
                     }`}
                     onClick={() => setSelectedFaceId(face.id === selectedFaceId ? null : face.id)}
                   >
-                    <td className="py-3 px-4">
-                      {face.image_url ? (
-                        <img 
-                          src={face.image_url} 
-                          alt={face.name} 
-                          className="h-10 w-10 rounded-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${face.name}&background=random`;
-                          }}
-                        />
-                      ) : (
-                        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                          <User className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                      )}
-                    </td>
+                     <td className="py-3 px-4">
+                       {face.image_url ? (
+                         <img 
+                           src={face.image_url.startsWith('data:') 
+                             ? face.image_url 
+                             : `https://zovwmlqnrsionbolcpng.supabase.co/storage/v1/object/public/face-images/${face.image_url}`
+                           } 
+                           alt={face.name} 
+                           className="h-10 w-10 rounded-full object-cover"
+                           onError={(e) => {
+                             (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(face.name)}&background=random&size=40`;
+                           }}
+                         />
+                       ) : (
+                         <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                           <User className="h-5 w-5 text-muted-foreground" />
+                         </div>
+                       )}
+                     </td>
                     <td className="py-3 px-4 font-medium">{face.name}</td>
                     <td className="py-3 px-4">{face.employee_id}</td>
                     <td className="py-3 px-4">{face.department}</td>
