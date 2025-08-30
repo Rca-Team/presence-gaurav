@@ -146,8 +146,8 @@ export async function detectFacesOptimized(
   }
 
   const detectionOptions = new faceapi.TinyFaceDetectorOptions({
-    inputSize: options.inputSize || 224, // Smaller input size for speed
-    scoreThreshold: options.scoreThreshold || 0.6 // Higher threshold for better accuracy
+    inputSize: options.inputSize || 320, // Larger input size for better detection
+    scoreThreshold: options.scoreThreshold || 0.4 // Lower threshold for better face detection
   });
 
   try {
