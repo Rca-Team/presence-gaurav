@@ -331,12 +331,28 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
                     </DropdownMenu>
                   </div>
                 </div>
-                 <div className="p-4 space-y-2">
+                  <div className="p-4 space-y-2">
                    <div className="flex justify-between items-start">
                      <h3 className="font-medium truncate">{face.name}</h3>
-                     <Badge variant="outline" className="ml-2 shrink-0">
-                       ID: {face.employee_id}
-                     </Badge>
+                     <div className="ml-2 shrink-0">
+                       {face.image_url ? (
+                         <img 
+                           src={face.image_url.startsWith('data:') 
+                             ? face.image_url 
+                             : `https://zovwmlqnrsionbolcpng.supabase.co/storage/v1/object/public/face-images/${face.image_url}`
+                           } 
+                           alt={face.name} 
+                           className="h-8 w-8 rounded-full object-cover border-2 border-border"
+                           onError={(e) => {
+                             (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(face.name)}&background=random&size=32`;
+                           }}
+                         />
+                       ) : (
+                         <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center border-2 border-border">
+                           <User className="h-4 w-4 text-muted-foreground" />
+                         </div>
+                       )}
+                     </div>
                    </div>
                    <p className="text-sm text-muted-foreground">{face.department}</p>
                    <div className="flex items-center justify-between pt-2 text-sm">
