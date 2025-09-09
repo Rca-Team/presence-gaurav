@@ -16,30 +16,39 @@ export type Database = {
     Tables: {
       attendance_records: {
         Row: {
+          confidence_score: number | null
           created_at: string
           device_info: Json | null
+          face_descriptor: string | null
           id: string
           image_url: string | null
+          recognized: boolean | null
           status: string | null
           timestamp: string
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          confidence_score?: number | null
           created_at?: string
           device_info?: Json | null
+          face_descriptor?: string | null
           id?: string
           image_url?: string | null
+          recognized?: boolean | null
           status?: string | null
           timestamp?: string
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          confidence_score?: number | null
           created_at?: string
           device_info?: Json | null
+          face_descriptor?: string | null
           id?: string
           image_url?: string | null
+          recognized?: boolean | null
           status?: string | null
           timestamp?: string
           updated_at?: string
@@ -47,36 +56,75 @@ export type Database = {
         }
         Relationships: []
       }
-      profiles: {
+      attendance_settings: {
         Row: {
           created_at: string
+          id: string
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          department: string | null
           display_name: string | null
+          employee_id: string | null
           id: string
           parent_email: string | null
           parent_name: string | null
           parent_phone: string | null
+          position: string | null
           updated_at: string
           user_id: string | null
+          username: string | null
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
+          department?: string | null
           display_name?: string | null
+          employee_id?: string | null
           id?: string
           parent_email?: string | null
           parent_name?: string | null
           parent_phone?: string | null
+          position?: string | null
           updated_at?: string
           user_id?: string | null
+          username?: string | null
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
+          department?: string | null
           display_name?: string | null
+          employee_id?: string | null
           id?: string
           parent_email?: string | null
           parent_name?: string | null
           parent_phone?: string | null
+          position?: string | null
           updated_at?: string
           user_id?: string | null
+          username?: string | null
         }
         Relationships: []
       }
