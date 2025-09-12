@@ -3,11 +3,10 @@ import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, MessageSquare, Send, Users } from 'lucide-react';
+import { Mail, Users } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 
 interface BulkNotificationServiceProps {
@@ -17,7 +16,6 @@ interface BulkNotificationServiceProps {
 const BulkNotificationService: React.FC<BulkNotificationServiceProps> = ({ availableFaces }) => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  const [notificationType, setNotificationType] = useState<'email' | 'sms' | 'both'>('both');
   const [message, setMessage] = useState('');
   const [subject, setSubject] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -86,13 +84,11 @@ School Administration`;
             parent_name: `Parent of ${selectedFace?.name}`
           };
 
-          // Call Supabase Edge Function for notifications
+          // Call Supabase Edge Function for email notification
           const { data, error } = await supabase.functions.invoke('send-notification', {
             body: {
-              type: notificationType,
               recipient: {
                 email: parentInfo.parent_email,
-                phone: parentInfo.parent_phone,
                 name: parentInfo.parent_name
               },
               message: {
@@ -118,8 +114,8 @@ School Administration`;
       await Promise.all(notificationPromises);
 
       toast({
-        title: "Bulk Notification Complete",
-        description: `Successfully sent ${successCount} notifications. ${errorCount > 0 ? `${errorCount} failed.` : ''}`,
+        title: "Bulk Email Notification Complete",
+        description: `Successfully sent ${successCount} email notifications. ${errorCount > 0 ? `${errorCount} failed.` : ''}`,
         variant: errorCount > 0 ? "destructive" : "default",
       });
       
@@ -158,59 +154,27 @@ School Administration`;
       
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Send Bulk Parent Notifications</DialogTitle>
+          <DialogTitle>Send Bulk Email Notifications to Parents</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>Notification Type</Label>
-            <Select value={notificationType} onValueChange={(value: 'email' | 'sms' | 'both') => setNotificationType(value)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="email">
-                  <div className="flex items-center">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Email Only
-                  </div>
-                </SelectItem>
-                <SelectItem value="sms">
-                  <div className="flex items-center">
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    SMS Only
-                  </div>
-                </SelectItem>
-                <SelectItem value="both">
-                  <div className="flex items-center">
-                    <Mail className="h-4 w-4 mr-1" />
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Both Email & SMS
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="subject">Email Subject</Label>
+            <Input
+              id="subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Enter email subject"
+            />
           </div>
           
-          {(notificationType === 'email' || notificationType === 'both') && (
-            <div className="space-y-2">
-              <Label htmlFor="subject">Email Subject</Label>
-              <Input
-                id="subject"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                placeholder="Enter email subject"
-              />
-            </div>
-          )}
-          
           <div className="space-y-2">
-            <Label htmlFor="message">Message</Label>
+            <Label htmlFor="message">Email Message</Label>
             <Textarea
               id="message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Enter notification message"
+              placeholder="Enter email message"
               rows={6}
             />
           </div>
@@ -253,7 +217,8 @@ School Administration`;
               Cancel
             </Button>
             <Button onClick={sendBulkNotification} disabled={isLoading || selectedStudents.length === 0}>
-              {isLoading ? "Sending..." : `Send to ${selectedStudents.length} Students`}
+              <Mail className="h-4 w-4 mr-2" />
+              {isLoading ? "Sending..." : `Send Email to ${selectedStudents.length} Students`}
             </Button>
           </div>
         </div>

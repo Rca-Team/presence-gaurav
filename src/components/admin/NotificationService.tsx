@@ -3,11 +3,10 @@ import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, MessageSquare, Send } from 'lucide-react';
+import { Mail, Send } from 'lucide-react';
 
 interface NotificationServiceProps {
   studentId?: string;
@@ -22,7 +21,6 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
 }) => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
-  const [notificationType, setNotificationType] = useState<'email' | 'sms' | 'both'>('both');
   const [message, setMessage] = useState('');
   const [subject, setSubject] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -110,13 +108,11 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
         return;
       }
 
-      // Call Supabase Edge Function for notifications
+      // Call Supabase Edge Function for email notification
       const { data, error } = await supabase.functions.invoke('send-notification', {
         body: {
-          type: notificationType,
           recipient: {
             email: parentInfo.parent_email,
-            phone: parentInfo.parent_phone,
             name: parentInfo.parent_name
           },
           message: {
@@ -134,8 +130,8 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
       if (error) throw error;
 
       toast({
-        title: "Notification Sent",
-        description: `${notificationType === 'both' ? 'Email and SMS' : notificationType.toUpperCase()} notification sent successfully.`,
+        title: "Email Notification Sent",
+        description: "Email notification sent successfully to parent.",
       });
       
       setOpen(false);
@@ -171,59 +167,27 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
       
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Send Parent Notification</DialogTitle>
+          <DialogTitle>Send Email Notification to Parent</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label>Notification Type</Label>
-            <Select value={notificationType} onValueChange={(value: 'email' | 'sms' | 'both') => setNotificationType(value)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="email">
-                  <div className="flex items-center">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Email Only
-                  </div>
-                </SelectItem>
-                <SelectItem value="sms">
-                  <div className="flex items-center">
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    SMS Only
-                  </div>
-                </SelectItem>
-                <SelectItem value="both">
-                  <div className="flex items-center">
-                    <Mail className="h-4 w-4 mr-1" />
-                    <MessageSquare className="h-4 w-4 mr-2" />
-                    Both Email & SMS
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="subject">Email Subject</Label>
+            <Input
+              id="subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Enter email subject"
+            />
           </div>
           
-          {(notificationType === 'email' || notificationType === 'both') && (
-            <div className="space-y-2">
-              <Label htmlFor="subject">Email Subject</Label>
-              <Input
-                id="subject"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                placeholder="Enter email subject"
-              />
-            </div>
-          )}
-          
           <div className="space-y-2">
-            <Label htmlFor="message">Message</Label>
+            <Label htmlFor="message">Email Message</Label>
             <Textarea
               id="message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Enter notification message"
+              placeholder="Enter email message"
               rows={6}
             />
           </div>
@@ -233,7 +197,8 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
               Cancel
             </Button>
             <Button onClick={sendNotification} disabled={isLoading}>
-              {isLoading ? "Sending..." : "Send Notification"}
+              <Mail className="h-4 w-4 mr-2" />
+              {isLoading ? "Sending..." : "Send Email"}
             </Button>
           </div>
         </div>
