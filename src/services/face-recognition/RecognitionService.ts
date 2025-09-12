@@ -39,11 +39,11 @@ export async function recognizeFace(faceDescriptor: Float32Array): Promise<Recog
     // Convert the descriptor to a string for comparison
     const faceDescriptorString = descriptorToString(faceDescriptor);
     
-    // Query registered faces from attendance_records
+    // Query registered faces from attendance_records (registered or pending_approval)
     const { data, error } = await supabase
       .from('attendance_records')
-      .select('*')
-      .eq('status', 'registered');
+      .select('id, user_id, status, device_info, face_descriptor')
+      .in('status', ['registered', 'pending_approval']);
     
     if (error) {
       console.error('Error querying attendance records:', error);
@@ -63,19 +63,25 @@ export async function recognizeFace(faceDescriptor: Float32Array): Promise<Recog
     // Compare the face descriptor against all registered faces
     for (const record of data) {
       try {
-        // Type check and safely access properties
-        const deviceInfo = record.device_info as DeviceInfo | null;
-        
-        if (
-          deviceInfo?.metadata?.faceDescriptor &&
-          typeof deviceInfo.metadata.faceDescriptor === 'string'
-        ) {
-          const registeredDescriptor = stringToDescriptor(deviceInfo.metadata.faceDescriptor);
+        // Prefer explicit column first
+        if (record.face_descriptor && typeof record.face_descriptor === 'string') {
+          const registeredDescriptor = stringToDescriptor(record.face_descriptor);
           const distance = calculateDistance(faceDescriptor, registeredDescriptor);
-          
-          const personName = deviceInfo.metadata.name || 'unknown';
-          console.log(`Face comparison: distance = ${distance.toFixed(4)} for ${personName}`);
-          
+          console.log(`Face comparison (column): distance = ${distance.toFixed(4)} for record ${record.id}`);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestMatch = record;
+          }
+        }
+        
+        // Fallback to legacy storage in device_info.metadata.faceDescriptor
+        const deviceInfo = record.device_info as DeviceInfo | null;
+        const metaDescriptor = deviceInfo?.metadata?.faceDescriptor;
+        if (metaDescriptor && typeof metaDescriptor === 'string') {
+          const registeredDescriptor = stringToDescriptor(metaDescriptor);
+          const distance = calculateDistance(faceDescriptor, registeredDescriptor);
+          const personName = deviceInfo?.metadata?.name || 'unknown';
+          console.log(`Face comparison (metadata): distance = ${distance.toFixed(4)} for ${personName}`);
           if (distance < bestDistance) {
             bestDistance = distance;
             bestMatch = record;

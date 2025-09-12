@@ -180,7 +180,7 @@ export const useOptimizedFaceRecognition = () => {
         console.log('Processing single face...');
         const detection = await detectSingleFaceOptimized(mediaElement, {
           enableTracking: options.enableTracking !== false,
-          skipFrames: options.skipFrames !== false
+          skipFrames: false
         });
 
         if (detection) {

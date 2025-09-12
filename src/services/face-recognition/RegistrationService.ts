@@ -38,6 +38,8 @@ export const registerFace = async (
       hasDescriptor: !!faceDescriptor
     });
     
+    let faceDescriptorString: string | null = null;
+    
     if (!imageBlob || imageBlob.size === 0) {
       console.error('Invalid image blob provided');
       throw new Error('Invalid image: The image blob is empty or invalid');
@@ -85,11 +87,10 @@ export const registerFace = async (
       firebase_image_url: imageUrl
     };
 
-    // If we have a face descriptor, store it as well
     if (faceDescriptor) {
-      const descriptorString = descriptorToString(faceDescriptor);
-      console.log('Descriptor converted to string, length:', descriptorString.length);
-      metadata.faceDescriptor = descriptorString;
+      faceDescriptorString = descriptorToString(faceDescriptor);
+      console.log('Descriptor converted to string, length:', faceDescriptorString.length);
+      metadata.faceDescriptor = faceDescriptorString;
     }
     
     // Create device info as a plain object that conforms to Json type
@@ -119,6 +120,7 @@ export const registerFace = async (
       status: 'registered' as const,
       device_info: deviceInfo,
       image_url: imageUrl,
+      face_descriptor: faceDescriptorString
     };
 
     // Try to insert with current auth context
