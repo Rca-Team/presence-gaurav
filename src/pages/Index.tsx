@@ -28,7 +28,7 @@ const Index = () => {
             
             <div className="flex flex-wrap gap-3 md:gap-4 pt-2">
               <Link to="/register">
-                <Button size="lg" className="rounded-full px-6 md:px-8 text-sm md:text-base bg-[hsl(var(--school-blue))] hover:bg-[hsl(var(--school-blue))]/90 animate-subtle-pulse">
+                <Button size="lg" className="rounded-full px-6 md:px-8 text-sm md:text-base \n  bg-gradient-to-r from-pink-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 \n  text-white animate-rainbow bg-[length:300%_300%] hover:opacity-90">
                   Get Started
                 </Button>
               </Link>
