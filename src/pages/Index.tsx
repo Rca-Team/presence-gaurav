@@ -13,7 +13,7 @@ const Index = () => {
       <section className="py-12 md:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
           <div className="space-y-4 md:space-y-6 animate-slide-in-left">
-            <div className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white animate-shimmer bg-[length:200%_100%]">
+            <div className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium \n  bg-gradient-to-r from-pink-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500\n  text-white animate-rainbow bg-[length:300%_300%]">
               <span className="flex h-2 w-2 rounded-full bg-white mr-2"></span>
               Introducing Presence
             </div>
