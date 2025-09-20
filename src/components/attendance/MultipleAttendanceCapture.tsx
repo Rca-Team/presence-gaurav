@@ -221,9 +221,9 @@ const MultipleAttendanceCapture: React.FC = () => {
         </CardHeader>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Camera Feed */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-4 order-2 lg:order-1">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
@@ -270,14 +270,15 @@ const MultipleAttendanceCapture: React.FC = () => {
               </div>
 
               {/* Controls */}
-              <div className="flex gap-2 mt-4">
+              <div className="flex flex-col sm:flex-row gap-2 mt-4">
                 <Button
                   onClick={handleCapture}
                   disabled={!isActive || isModelLoading || isProcessing || isContinuous}
                   className="flex-1"
                 >
                   <Camera className="h-4 w-4 mr-2" />
-                  Capture Faces
+                  <span className="hidden sm:inline">Capture Faces</span>
+                  <span className="sm:hidden">Capture</span>
                 </Button>
                 
                 <Button
@@ -289,12 +290,14 @@ const MultipleAttendanceCapture: React.FC = () => {
                   {isContinuous ? (
                     <>
                       <Pause className="h-4 w-4 mr-2" />
-                      Stop Continuous
+                      <span className="hidden sm:inline">Stop Continuous</span>
+                      <span className="sm:hidden">Stop</span>
                     </>
                   ) : (
                     <>
                       <Play className="h-4 w-4 mr-2" />
-                      Start Continuous
+                      <span className="hidden sm:inline">Start Continuous</span>
+                      <span className="sm:hidden">Start</span>
                     </>
                   )}
                 </Button>
@@ -302,8 +305,10 @@ const MultipleAttendanceCapture: React.FC = () => {
                 <Button
                   onClick={handleReset}
                   variant="outline"
+                  className="sm:w-auto"
                 >
-                  <RotateCcw className="h-4 w-4" />
+                  <RotateCcw className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Reset</span>
                 </Button>
               </div>
 
@@ -317,7 +322,7 @@ const MultipleAttendanceCapture: React.FC = () => {
         </div>
 
         {/* Stats and Results */}
-        <div className="space-y-4">
+        <div className="space-y-4 order-1 lg:order-2">
           {/* Performance Stats */}
           <Card>
             <CardHeader>

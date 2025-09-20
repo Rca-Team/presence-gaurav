@@ -45,35 +45,44 @@ const Attendance = () => {
       />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="single" className="flex items-center gap-2">
-            <Camera className="h-4 w-4" />
-            Single Face
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 p-1">
+          <TabsTrigger value="single" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2">
+            <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Single Face</span>
+            <span className="sm:hidden">Single</span>
           </TabsTrigger>
-          <TabsTrigger value="multiple" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Multiple Faces
-            <Badge variant="secondary" className="text-xs">New</Badge>
+          <TabsTrigger value="multiple" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2">
+            <Users className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Multiple Faces</span>
+            <span className="sm:hidden">Multiple</span>
+            <Badge variant="secondary" className="text-xs ml-1 hidden sm:inline">New</Badge>
           </TabsTrigger>
-          <TabsTrigger value="stats" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Statistics
+          <TabsTrigger value="stats" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2">
+            <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Statistics</span>
+            <span className="sm:hidden">Stats</span>
           </TabsTrigger>
-          <TabsTrigger value="help" className="flex items-center gap-2">
-            <Info className="h-4 w-4" />
-            Help
+          <TabsTrigger value="help" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-3 py-2">
+            <Info className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span>Help</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="single" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-6">
+        <TabsContent value="single" className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="lg:col-span-2 space-y-4 sm:space-y-6 order-2 lg:order-1">
               <AttendanceCapture />
-              {/* <AttendanceResult /> */}
             </div>
-            <div className="space-y-6">
-              <AttendanceSidebar />
-              <AttendanceToday />
+            <div className="space-y-4 sm:space-y-6 order-1 lg:order-2">
+              <div className="block lg:hidden">
+                <AttendanceToday />
+              </div>
+              <div className="hidden lg:block">
+                <AttendanceSidebar />
+                <div className="mt-4 sm:mt-6">
+                  <AttendanceToday />
+                </div>
+              </div>
             </div>
           </div>
         </TabsContent>
@@ -82,12 +91,12 @@ const Attendance = () => {
           <MultipleAttendanceCapture />
         </TabsContent>
 
-        <TabsContent value="stats" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+        <TabsContent value="stats" className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="lg:col-span-2 order-2 lg:order-1">
               <AttendanceStats />
             </div>
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6 order-1 lg:order-2">
               <AttendanceToday />
             </div>
           </div>

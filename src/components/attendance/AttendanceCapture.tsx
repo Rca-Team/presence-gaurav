@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useOptimizedFaceRecognition } from '@/hooks/useOptimizedFaceRecognition';
 import AttendanceResult from './AttendanceResult';
 import UnrecognizedFaceAlert from './UnrecognizedFaceAlert';
+import RecognizedFaceAlert from './RecognizedFaceAlert';
 import { loadOptimizedModels } from '@/services/face-recognition/OptimizedModelService';
 import { videoEnhancementService } from '@/services/ai/VideoEnhancementService';
 import { AlertCircle, Sparkles } from 'lucide-react';
@@ -25,6 +26,13 @@ const AttendanceCapture = () => {
   const [unrecognizedAlert, setUnrecognizedAlert] = useState<{
     imageUrl: string;
     timestamp: Date;
+  } | null>(null);
+  
+  const [recognizedAlert, setRecognizedAlert] = useState<{
+    employee: any;
+    status: 'present' | 'late';
+    timestamp: Date;
+    imageUrl?: string;
   } | null>(null);
   
   const {
@@ -179,6 +187,28 @@ const AttendanceCapture = () => {
         
         if (single.recognized && single.employee) {
           const displayStatus = single.status === 'present' ? 'present' : single.status === 'late' ? 'late' : 'unauthorized';
+          
+          // Capture image for recognized faces too
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          let imageUrl = '';
+          if (ctx && webcamRef.current) {
+            canvas.width = webcamRef.current.videoWidth;
+            canvas.height = webcamRef.current.videoHeight;
+            ctx.drawImage(webcamRef.current, 0, 0);
+            imageUrl = canvas.toDataURL('image/jpeg');
+          }
+          
+          // Show popup for present and late status
+          if (displayStatus === 'present' || displayStatus === 'late') {
+            setRecognizedAlert({
+              employee: single.employee,
+              status: displayStatus,
+              timestamp: new Date(),
+              imageUrl: imageUrl
+            });
+          }
+          
           const statusMessage = displayStatus === 'present' ? 'present' : displayStatus === 'late' ? 'late' : 'not authorized';
           
           toast({
@@ -220,11 +250,11 @@ const AttendanceCapture = () => {
   };
   
   return (
-    <Card className="p-6">
+    <Card className="p-4 sm:p-6">
       <h3 className="text-lg font-medium mb-4">Facial Recognition</h3>
         <div className="space-y-4">
         {/* Video Enhancement Controls */}
-        <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-muted rounded-lg">
           <div className="flex items-center space-x-2">
             <Sparkles className="h-4 w-4 text-primary" />
             <span className="text-sm font-medium">AI Video Enhancement</span>
@@ -238,6 +268,7 @@ const AttendanceCapture = () => {
               size="sm"
               onClick={() => setEnhancementEnabled(!enhancementEnabled)}
               disabled={isProcessing || isEnhancing}
+              className="text-xs sm:text-sm"
             >
               {enhancementEnabled ? 'Disable' : 'Enable'} Enhancement
             </Button>
@@ -246,6 +277,17 @@ const AttendanceCapture = () => {
             )}
           </div>
         </div>
+
+        {/* Recognized Face Alert */}
+        {recognizedAlert && (
+          <RecognizedFaceAlert
+            employee={recognizedAlert.employee}
+            status={recognizedAlert.status}
+            timestamp={recognizedAlert.timestamp}
+            imageUrl={recognizedAlert.imageUrl}
+            onDismiss={() => setRecognizedAlert(null)}
+          />
+        )}
 
         {/* Unrecognized Face Alert */}
         {unrecognizedAlert && (
