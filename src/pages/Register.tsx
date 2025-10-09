@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
+import { useNavigate } from 'react-router-dom';
 import PageLayout from '@/components/layouts/PageLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { Card } from '@/components/ui/card';
@@ -16,14 +17,18 @@ import {
   SelectValue 
 } from '@/components/ui/select';
 import { loadModels, getFaceDescriptor, registerFace } from '@/services/FaceRecognitionService';
-import { v4 as uuidv4 } from 'uuid';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const Register = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { signUp } = useAuth();
   const webcamRef = useRef<HTMLVideoElement | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    password: '',
     phone: '',
     parentName: '',
     parentEmail: '',
@@ -121,30 +126,59 @@ const Register = () => {
       });
       return;
     }
+
+    if (!formData.email || !formData.password) {
+      toast({
+        title: "Missing credentials",
+        description: "Please provide email and password",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsSubmitting(true);
     
     try {
-      console.log('Submitting registration data');
+      console.log('Creating user account');
       
-      // Generate a proper UUID for the user
-      const userId = uuidv4();
+      // Step 1: Create user account with Supabase Auth
+      const { error: signUpError } = await signUp(
+        formData.email,
+        formData.password,
+        {
+          display_name: formData.name,
+          username: formData.employeeId,
+        }
+      );
       
-      console.log('Using UUID for registration:', userId);
+      if (signUpError) {
+        throw signUpError;
+      }
+
+      // Wait a moment for the trigger to create the profile
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Convert the base64 image to a blob
+      console.log('User account created, registering face');
+      
+      // Step 2: Convert the base64 image to a blob
       const response = await fetch(faceImage);
       const imageBlob = await response.blob();
       
-      // Register face with our service including parent contact info
+      // Step 3: Get the newly created user from session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("No session found after signup");
+      }
+      
+      // Step 4: Register face with our service
       const registrationData = await registerFace(
         imageBlob,
         formData.name,
         formData.employeeId,
         formData.department,
         formData.position || '',
-        userId,
-        faceDescriptor, // Pass the face descriptor to the registration function
+        session.user.id,
+        faceDescriptor,
         {
           phone: formData.phone,
           parent_name: formData.parentName,
@@ -156,38 +190,20 @@ const Register = () => {
       if (registrationData) {
         toast({
           title: "Registration Successful",
-          description: "Your face has been registered for attendance",
+          description: "Please check your email to verify your account.",
         });
         console.log('Registration completed successfully');
         
-        // Reset form
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          parentName: '',
-          parentEmail: '',
-          parentPhone: '',
-          employeeId: '',
-          department: '',
-          position: '',
-          year: '',
-          major: '',
-          standing: '',
-          startingYear: '',
-        });
-        setFaceImage(null);
-        setFaceDescriptor(null);
-        setFaceCaptured(false);
-        setRegistrationStep(1);
+        // Navigate to login
+        navigate('/login');
       } else {
-        throw new Error("Registration failed");
+        throw new Error("Face registration failed");
       }
-    } catch (error) {
-      console.error('Error registering face:', error);
+    } catch (error: any) {
+      console.error('Error during registration:', error);
       toast({
         title: "Registration Failed",
-        description: "There was an error registering your face. Please try again.",
+        description: error.message || "There was an error registering your account. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -277,6 +293,35 @@ const Register = () => {
                       value={formData.email}
                       onChange={handleInputChange}
                       placeholder="john.doe@example.com"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      placeholder="••••••••"
+                      required
+                      minLength={6}
+                    />
+                    <p className="text-xs text-muted-foreground">Minimum 6 characters</p>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="employeeId">Student ID</Label>
+                    <Input
+                      id="employeeId"
+                      name="employeeId"
+                      value={formData.employeeId}
+                      onChange={handleInputChange}
+                      placeholder="STU123456"
                       required
                     />
                   </div>

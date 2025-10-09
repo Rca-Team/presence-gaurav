@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -8,27 +7,45 @@ import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import Logo from '@/components/Logo';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signIn, user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
   
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate authentication delay
-    setTimeout(() => {
+    const { error } = await signIn(email, password);
+    
+    if (error) {
       setIsLoading(false);
-      
       toast({
-        title: "Login successful",
-        description: "Welcome back to Presence",
+        title: "Login failed",
+        description: error.message || "Invalid email or password",
+        variant: "destructive",
       });
-      
-      navigate('/dashboard');
-    }, 1500);
+      return;
+    }
+    
+    toast({
+      title: "Login successful",
+      description: "Welcome back to Presence",
+    });
+    
+    navigate('/dashboard');
   };
 
   return (
@@ -73,7 +90,14 @@ const Login = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="name@example.com" required />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  placeholder="name@example.com" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required 
+                />
               </div>
               
               <div className="space-y-2">
@@ -86,7 +110,14 @@ const Login = () => {
                     Forgot password?
                   </Link>
                 </div>
-                <Input id="password" type="password" placeholder="••••••••" required />
+                <Input 
+                  id="password" 
+                  type="password" 
+                  placeholder="••••••••" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required 
+                />
               </div>
               
               <div className="flex items-center space-x-2">

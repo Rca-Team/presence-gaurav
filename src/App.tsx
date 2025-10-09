@@ -16,6 +16,8 @@ import Contact from './pages/Contact';
 import NotificationDemo from './pages/NotificationDemo';
 import SplashAnimation from "./components/SplashAnimation";
 import { AttendanceProvider } from './contexts/AttendanceContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { AnimatePresence } from 'framer-motion';
 import { ThemeProvider } from './hooks/use-theme';
 import MobileSidebar from "./components/MobileSidebar";
@@ -30,13 +32,29 @@ function AnimatedRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Index />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/attendance" element={<Attendance />} />
-        <Route path="/admin" element={<Admin />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/attendance" element={
+          <ProtectedRoute>
+            <Attendance />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin" element={
+          <ProtectedRoute requireAdmin>
+            <Admin />
+          </ProtectedRoute>
+        } />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/notifications" element={<NotificationDemo />} />
+        <Route path="/notifications" element={
+          <ProtectedRoute requireAdmin>
+            <NotificationDemo />
+          </ProtectedRoute>
+        } />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AnimatePresence>
@@ -48,27 +66,29 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme="light">
-      <AttendanceProvider>
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            
-            {/* Splash Animation */}
-            {showSplash && (
-              <SplashAnimation 
-                onComplete={() => setShowSplash(false)}
-                duration={3000} 
-              />
-            )}
-            
-            <BrowserRouter>
-              <AnimatedRoutes />
-              <MobileSidebar />
-            </BrowserRouter>
-          </TooltipProvider>
-        </QueryClientProvider>
-      </AttendanceProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <AttendanceProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              
+              {/* Splash Animation */}
+              {showSplash && (
+                <SplashAnimation 
+                  onComplete={() => setShowSplash(false)}
+                  duration={3000} 
+                />
+              )}
+              
+              <BrowserRouter>
+                <AnimatedRoutes />
+                <MobileSidebar />
+              </BrowserRouter>
+            </TooltipProvider>
+          </AttendanceProvider>
+        </AuthProvider>
+      </QueryClientProvider>
     </ThemeProvider>
   );
 }
