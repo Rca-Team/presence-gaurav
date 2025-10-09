@@ -5,17 +5,15 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Logo from './Logo';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { Sun, Moon, LogOut } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 import { useTheme } from '@/hooks/use-theme';
-import { useAuth } from '@/contexts/AuthContext';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
   const { theme, setTheme } = useTheme();
-  const { user, signOut } = useAuth();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -84,26 +82,16 @@ const Navbar = () => {
               <Sun className="h-5 w-5 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-500 rotate-0 scale-100 text-yellow-500 animate-pulse-subtle" />
             )}
           </Toggle>
-          
-          {user ? (
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
+          <Link to="/login">
+            <Button variant="ghost" size="sm">
+              Sign In
             </Button>
-          ) : (
-            <>
-              <Link to="/login">
-                <Button variant="ghost" size="sm">
-                  Sign In
-                </Button>
-              </Link>
-              <Link to="/register">
-                <Button size="sm" className="animate-pulse-subtle">
-                  Get Started
-                </Button>
-              </Link>
-            </>
-          )}
+          </Link>
+          <Link to="/register">
+            <Button size="sm" className="animate-pulse-subtle">
+              Get Started
+            </Button>
+          </Link>
         </div>
       </div>
     </header>
