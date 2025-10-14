@@ -47,7 +47,7 @@ function App() {
   const [showSplash, setShowSplash] = useState(true);
 
   return (
-    <ThemeProvider defaultTheme="light">
+    <ThemeProvider defaultTheme="dark">
       <AttendanceProvider>
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
@@ -58,7 +58,7 @@ function App() {
             {showSplash && (
               <SplashAnimation 
                 onComplete={() => setShowSplash(false)}
-                duration={3000} 
+                duration={3500} 
               />
             )}
             

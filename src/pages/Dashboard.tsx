@@ -5,10 +5,17 @@ import { useQuery } from '@tanstack/react-query';
 import PageLayout from '@/components/layouts/PageLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
-import { Layout, BarChart3 } from 'lucide-react';
+import { 
+  Layout, 
+  BarChart3, 
+  Users, 
+  UserCheck, 
+  UserX, 
+  Clock 
+} from 'lucide-react';
+import { CounterCard } from '@/components/ui/counter-card';
 
 // Import refactored components
-import StatsOverview from '@/components/dashboard/StatsOverview';
 import DashboardCharts from '@/components/dashboard/DashboardCharts';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import StatusChart from '@/components/dashboard/StatusChart';
@@ -62,62 +69,97 @@ const Dashboard = () => {
   }
   
   return (
-    <PageLayout className="school-gradient-bg">
-      <PageHeader
-        title="School Dashboard"
-        description="Real-time overview of your school attendance statistics and analytics"
-        className="animate-slide-in-down"
-        icon={<Layout className="h-8 w-8 text-[hsl(var(--school-blue))]" />}
-      >
-        <Link to="/attendance">
-          <Button className="bg-[hsl(var(--school-green))] hover:bg-[hsl(var(--school-green))]/90">
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Take Attendance
-          </Button>
-        </Link>
-      </PageHeader>
-      
-      {/* School-themed decorative element */}
-      <div className="flex justify-center gap-5 opacity-80 my-6">
-        <div className="h-1 w-16 rounded-full bg-[hsl(var(--school-blue))]"></div>
-        <div className="h-1 w-16 rounded-full bg-[hsl(var(--school-green))]"></div>
-        <div className="h-1 w-16 rounded-full bg-[hsl(var(--school-yellow))]"></div>
-      </div>
-      
-      {/* Cutoff Time Display */}
-      <div className="mb-6">
-        <CutoffTimeDisplay />
+    <PageLayout className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse-subtle" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse-subtle" style={{ animationDelay: '1s' }} />
       </div>
 
-      {/* Stats Overview */}
-      <StatsOverview isLoading={isLoading} data={data} refetch={refetchDashboard} />
-      
-      {/* Charts */}
-      <DashboardCharts 
-        isLoading={isLoading} 
-        weeklyData={data?.weeklyData} 
-        departmentData={data?.departmentData} 
-      />
-      
-      {/* Additional Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <RecentActivity 
-          isLoading={isLoading} 
-          activityData={data?.recentActivity} 
-        />
-        
-        <StatusChart 
-          isLoading={isLoading} 
-          statusData={data?.statusData} 
-        />
+      <div className="relative">
+        <PageHeader
+          title={
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Attendance Dashboard
+            </span>
+          }
+          description="Real-time overview of attendance statistics and analytics"
+          className="animate-slide-in-down"
+          icon={<Layout className="h-8 w-8 text-cyan-400" />}
+        >
+          <Link to="/attendance">
+            <Button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 shadow-lg hover:shadow-cyan-500/50 transition-all duration-300">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Take Attendance
+            </Button>
+          </Link>
+        </PageHeader>
+
+        {/* Cutoff Time Display */}
+        <div className="mb-8 animate-slide-in-up">
+          <CutoffTimeDisplay />
+        </div>
+
+        {/* Stats Cards with Counter Animation */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-in-up" style={{ animationDelay: '0.1s' }}>
+          <CounterCard
+            title="Total Students"
+            value={data?.totalUsers || 0}
+            icon={Users}
+            color="cyan"
+          />
+          <CounterCard
+            title="Present Today"
+            value={data?.presentToday || 0}
+            icon={UserCheck}
+            color="green"
+          />
+          <CounterCard
+            title="Weekly Average"
+            value={data?.weeklyAverage || 0}
+            icon={BarChart3}
+            color="blue"
+          />
+          <CounterCard
+            title="Attendance Rate"
+            value={data?.presentPercentage || 0}
+            icon={Clock}
+            color="purple"
+          />
+        </div>
+
+        {/* Charts */}
+        <div className="animate-slide-in-up" style={{ animationDelay: '0.2s' }}>
+          <DashboardCharts 
+            isLoading={isLoading} 
+            weeklyData={data?.weeklyData} 
+            departmentData={data?.departmentData} 
+          />
+        </div>
+
+        {/* Recent Activity & Status */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 animate-slide-in-up" style={{ animationDelay: '0.3s' }}>
+          <div className="lg:col-span-2">
+            <RecentActivity 
+              isLoading={isLoading} 
+              activityData={data?.recentActivity} 
+            />
+          </div>
+          <StatusChart 
+            isLoading={isLoading} 
+            statusData={data?.statusData} 
+          />
+        </div>
+
+        {/* Registered Faces */}
+        <div className="animate-slide-in-up" style={{ animationDelay: '0.4s' }}>
+          <RegisteredFaces 
+            isLoading={facesLoading} 
+            faces={registeredFaces} 
+            refetchFaces={refetchFaces} 
+          />
+        </div>
       </div>
-      
-      {/* Registered Faces Section */}
-      <RegisteredFaces 
-        isLoading={facesLoading} 
-        faces={registeredFaces} 
-        refetchFaces={refetchFaces} 
-      />
     </PageLayout>
   );
 };
