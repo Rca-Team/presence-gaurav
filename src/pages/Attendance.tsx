@@ -37,9 +37,9 @@ const Attendance = () => {
   }, [toast]);
   
   return (
-    <PageLayout className="school-gradient-bg">
+    <PageLayout className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <PageHeader 
-        title="Face Recognition Attendance" 
+        title={<span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">Face Recognition Attendance</span>}
         description="Advanced facial recognition system with multiple face detection and optimized performance"
         className="animate-slide-in-down"
       />
