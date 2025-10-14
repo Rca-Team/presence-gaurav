@@ -196,18 +196,18 @@ const Register = () => {
   };
 
   return (
-    <PageLayout className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <PageLayout>
       <PageHeader
-        title={<span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">Register Your Face</span>}
-        description="Complete the form and capture your face for facial recognition attendance"
+        title="Register Your Face"
+        description="Complete the form and capture your face to register for facial recognition attendance"
         className="animate-slide-in-down"
       />
       
       <div className="max-w-3xl mx-auto">
-        <Card className="p-6 mb-8 animate-slide-in-up backdrop-panel border-cyan-500/20">
+        <Card className="p-6 mb-8 animate-slide-in-up">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-medium bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Registration Steps</h3>
-            <span className="text-sm text-slate-400">Step {registrationStep} of 2</span>
+            <h3 className="text-lg font-medium">Registration Steps</h3>
+            <span className="text-sm text-muted-foreground">Step {registrationStep} of 2</span>
           </div>
           
           <div className="relative">
@@ -253,7 +253,7 @@ const Register = () => {
         
         <form onSubmit={handleSubmit}>
           {registrationStep === 1 ? (
-            <Card className="p-6 animate-slide-in-up backdrop-panel border-cyan-500/20">
+            <Card className="p-6 animate-slide-in-up">
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -451,9 +451,9 @@ const Register = () => {
             </Card>
           ) : (
             <div className="space-y-6 animate-slide-in-up">
-              <Card className="p-6 backdrop-panel border-cyan-500/20">
+              <Card className="p-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Capture Your Face</h3>
+                  <h3 className="text-lg font-medium">Capture Your Face</h3>
                   <p className="text-muted-foreground">
                     Please look directly at the camera and ensure your face is clearly visible.
                   </p>

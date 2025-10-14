@@ -13,43 +13,41 @@ const Index = () => {
       <section className="py-12 md:py-24">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
           <div className="space-y-4 md:space-y-6 animate-slide-in-left">
-            <div className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 border border-cyan-500/30 backdrop-blur-sm">
-              <span className="flex h-2 w-2 rounded-full bg-cyan-400 mr-2 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]"></span>
-              <span className="text-cyan-400">Introducing PRESENCE</span>
+            <div className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium \n  bg-gradient-to-r from-pink-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500\n  text-white animate-rainbow bg-[length:300%_300%]">
+              <span className="flex h-2 w-2 rounded-full bg-white mr-2"></span>
+              Introducing Presence
             </div>
             
             <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-balance">
-              Attendance Made <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Simple</span> and <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Secure</span>
+              Attendance Made <span className="text-[hsl(var(--school-blue))]">Simple</span> and <span className="text-[hsl(var(--school-green))]">Secure</span>
             </h1>
             
-            <p className="text-base md:text-lg lg:text-xl text-slate-400 max-w-xl text-balance">
-              Transform your school's attendance process with advanced facial recognition technology. Fast, accurate, and designed for modern education.
+            <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-xl text-balance">
+              Transform your school's attendance process with advanced facial recognition technology. Fast, accurate, and designed specifically for educational institutions.
             </p>
             
             <div className="flex flex-wrap gap-3 md:gap-4 pt-2">
               <Link to="/register">
-                <Button size="lg" className="rounded-full px-6 md:px-8 text-sm md:text-base bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500 text-white hover:opacity-90 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+                <Button size="lg" className="rounded-full px-6 md:px-8 text-sm md:text-base \n  bg-gradient-to-r from-pink-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 \n  text-white animate-rainbow bg-[length:300%_300%] hover:opacity-90">
                   Get Started
                 </Button>
               </Link>
               <Link to="/dashboard">
-                <Button size="lg" variant="outline" className="rounded-full px-6 md:px-8 text-sm md:text-base border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10">
-                  Mark Attendance
-                </Button>
+                <Button size="lg" variant="outline" className="rounded-full px-6 md:px-8 text-sm md:text-base border-[hsl(var(--school-blue))] text-[hsl(var(--school-blue))] iso-button">Mark Attendance </Button>
               </Link>
             </div>
           </div>
           
           <div className="relative mt-4 md:mt-0 animate-slide-in-right">
-            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 rounded-3xl blur-xl"></div>
-            <Card className="backdrop-panel overflow-hidden relative z-10 border-cyan-500/20">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500"></div>
-              <Webcam className="w-full max-h-[400px] md:max-h-none" autoStart={false} overlayClassName="border-cyan-500/30" />
+            <div className="absolute -inset-1 bg-gradient-to-r from-[hsl(var(--school-blue))]/20 to-[hsl(var(--school-purple))]/10 rounded-3xl blur-xl opacity-70"></div>
+            <Card className="school-card backdrop-panel overflow-hidden relative z-10 animate-float-shadow">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[hsl(var(--school-blue))] via-[hsl(var(--school-green))] to-[hsl(var(--school-yellow))]"></div>
+              <Webcam className="w-full max-h-[400px] md:max-h-none" autoStart={false} overlayClassName="border-[hsl(var(--school-blue))]/20" />
             </Card>
             
-            {/* Decorative neon elements */}
-            <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-cyan-500/20 rounded-full backdrop-blur-md z-0 animate-pulse"></div>
-            <div className="absolute -top-4 -right-4 w-20 h-20 bg-purple-500/20 rounded-full backdrop-blur-md z-0 animate-pulse" style={{
+            {/* Decorative elements */}
+            <div className="absolute -bottom-4 -left-4 w-12 h-12 bg-[hsl(var(--school-yellow))]/10 rounded-full backdrop-blur-md z-0 animate-float"></div>
+            <div className="absolute -top-4 -right-4 w-16 h-16 bg-[hsl(var(--school-green))]/10 rounded-full backdrop-blur-md z-0 animate-float" style={{
             animationDelay: '1s'
           }}></div>
           </div>

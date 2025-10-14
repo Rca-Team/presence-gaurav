@@ -137,9 +137,9 @@ const Admin = () => {
   }, [attendanceUpdated]);
 
   return (
-    <PageLayout className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <PageLayout>
       <PageHeader 
-        title={<span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">Admin Dashboard</span>}
+        title="Admin Dashboard" 
         description="Manage registered faces and view detailed attendance records in real-time"
       >
         <div className="flex gap-2">

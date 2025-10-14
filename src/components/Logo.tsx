@@ -17,28 +17,31 @@ const Logo: React.FC<LogoProps> = ({ className, size = 'md' }) => {
 
   return (
     <div className={cn("font-semibold tracking-tight flex items-center gap-2", sizeClasses[size], className)}>
-      <div className="relative w-12 h-12 rounded-lg overflow-hidden group">
-        {/* Neon glow background matching splash animation */}
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/30 via-blue-500/30 to-purple-500/30 rounded-lg blur-xl animate-pulse"></div>
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"></div>
+      <div className="relative w-12 h-12 rounded-lg overflow-hidden group hover-3d">
+        {/* Animated background with enhanced shine effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/40 via-indigo-600/40 to-sky-500/40 animate-pulse-subtle"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer bg-[length:200%_100%]"></div>
         
-        {/* Animated shimmer overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer bg-[length:200%_100%]"></div>
+        {/* School icons that rotate on hover with smoother transitions */}
+        <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:rotate-0 rotate-0">
+          <GraduationCap className="w-6 h-6 text-primary animate-float z-10" />
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 group-hover:opacity-100 rotate-90">
+          <BookOpen className="w-6 h-6 text-[hsl(var(--school-green))] animate-float z-10" />
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 group-hover:opacity-100 rotate-180">
+          <Award className="w-6 h-6 text-[hsl(var(--school-yellow))] animate-float z-10" />
+        </div>
         
-        {/* School icons that rotate */}
-        <div className="absolute inset-0 flex items-center justify-center transition-all duration-500">
-          <GraduationCap className="w-6 h-6 text-cyan-400 animate-float z-10 drop-shadow-[0_0_8px_rgba(34,211,238,0.6)]" />
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 group-hover:opacity-100">
-          <BookOpen className="w-6 h-6 text-blue-400 animate-float z-10 drop-shadow-[0_0_8px_rgba(96,165,250,0.6)]" />
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 group-hover:opacity-100 scale-0 group-hover:scale-100">
-          <Award className="w-6 h-6 text-purple-400 animate-float z-10 drop-shadow-[0_0_8px_rgba(192,132,252,0.6)]" />
-        </div>
+        {/* Decorative school elements with glow effect */}
+        <div className="absolute bottom-1 left-1 w-2 h-2 bg-[hsl(var(--school-red))] rounded-full opacity-70 shadow-[0_0_10px_rgba(220,38,38,0.5)]"></div>
+        <div className="absolute top-1 right-1 w-2 h-2 bg-[hsl(var(--school-green))] rounded-full opacity-70 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+        <div className="absolute top-1 left-1 w-2 h-2 bg-[hsl(var(--school-blue))] rounded-full opacity-70 shadow-[0_0_10px_rgba(59,130,246,0.5)]"></div>
+        <div className="absolute bottom-1 right-1 w-2 h-2 bg-[hsl(var(--school-yellow))] rounded-full opacity-70 shadow-[0_0_10px_rgba(234,179,8,0.5)]"></div>
       </div>
       <div className="flex flex-col">
-        <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 animate-shimmer bg-[length:200%_100%] font-bold">PRESENCE</span>
-        <span className="text-xs text-slate-400 mt-[-3px]">Smart Attendance</span>
+        <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-600 animate-shimmer bg-[length:200%_100%]">Presence</span>
+        <span className="text-xs text-muted-foreground mt-[-3px]">School Attendance</span>
       </div>
     </div>
   );
