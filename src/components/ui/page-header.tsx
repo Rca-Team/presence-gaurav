@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 interface PageHeaderProps {
-  title: string;
+  title: string | ReactNode;
   description?: string;
   children?: ReactNode;
   className?: string;

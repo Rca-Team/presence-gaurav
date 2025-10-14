@@ -58,45 +58,51 @@
   }
 
   .dark {
-    --background: 220 25% 10%;
-    --foreground: 210 20% 98%;
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
 
-    --card: 220 25% 12%;
-    --card-foreground: 210 20% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 220 25% 12%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 212 100% 47%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
 
-    --secondary: 220 25% 16%;
-    --secondary-foreground: 210 20% 98%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 220 25% 16%;
-    --muted-foreground: 220 15% 70%;
+    --muted: 223 47% 11%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 220 25% 16%;
-    --accent-foreground: 210 20% 98%;
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 220 25% 16%;
-    --input: 220 25% 16%;
-    --ring: 212 100% 47%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 224 76% 48%;
 
-    --gradient-start: rgba(25, 30, 40, 0.8);
-    --gradient-end: rgba(35, 40, 50, 0.8);
+    --gradient-start: rgba(15, 23, 42, 0.95);
+    --gradient-end: rgba(30, 41, 59, 0.95);
 
-    --sidebar-background: 220 25% 10%;
-    --sidebar-foreground: 210 20% 98%;
-    --sidebar-primary: 212 100% 47%;
-    --sidebar-primary-foreground: 210 40% 98%;
-    --sidebar-accent: 220 25% 16%;
-    --sidebar-accent-foreground: 210 20% 98%;
-    --sidebar-border: 220 25% 16%;
-    --sidebar-ring: 212 100% 47%;
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 224 76% 48%;
+
+    /* Neon accents for dark mode */
+    --neon-cyan: 189 97% 75%;
+    --neon-purple: 271 91% 65%;
+    --neon-blue: 217 91% 60%;
+    --neon-pink: 316 73% 69%;
   }
 }
 
@@ -136,7 +142,7 @@
 
 @layer components {
   .glass-panel {
-    @apply bg-white/80 dark:bg-black/20 backdrop-blur-md border border-white/30 dark:border-white/10 rounded-2xl shadow-sm;
+    @apply bg-white/80 dark:bg-slate-900/40 backdrop-blur-xl border border-white/30 dark:border-cyan-500/20 rounded-2xl shadow-lg dark:shadow-cyan-500/10;
     transition: all 0.4s var(--animation-timing);
   }
   
@@ -185,9 +191,22 @@
     @apply text-sm sm:text-base md:text-lg;
   }
 
+  /* Neon glow effects */
+  .neon-glow-cyan {
+    box-shadow: 0 0 20px hsl(var(--neon-cyan) / 0.3), 0 0 40px hsl(var(--neon-cyan) / 0.2);
+  }
+
+  .neon-glow-purple {
+    box-shadow: 0 0 20px hsl(var(--neon-purple) / 0.3), 0 0 40px hsl(var(--neon-purple) / 0.2);
+  }
+
+  .neon-glow-blue {
+    box-shadow: 0 0 20px hsl(var(--neon-blue) / 0.3), 0 0 40px hsl(var(--neon-blue) / 0.2);
+  }
+
   /* School themed components - enhanced with ISO UI style */
   .school-card {
-    @apply relative overflow-hidden rounded-xl border bg-white/90 dark:bg-black/20 shadow-md transition-all hover:shadow-xl;
+    @apply relative overflow-hidden rounded-xl border bg-white/90 dark:bg-slate-900/60 dark:border-cyan-500/30 shadow-md transition-all hover:shadow-xl dark:hover:shadow-cyan-500/20;
     transition: all 0.4s var(--animation-timing);
   }
 

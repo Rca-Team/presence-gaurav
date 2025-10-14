@@ -1,24 +1,26 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import Logo from '@/components/Logo';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Sparkles, Lock, Mail } from 'lucide-react';
 
 const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate authentication delay
     setTimeout(() => {
       setIsLoading(false);
       
@@ -32,94 +34,140 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
-      {/* Image Section */}
-      <div className="hidden lg:block relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary/10"></div>
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ 
-            backgroundImage: `url('https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1974&auto=format&fit=crop')`,
-            backgroundSize: 'cover'
-          }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/40 to-transparent"></div>
-        </div>
-        <div className="relative h-full flex items-center p-12">
-          <div className="max-w-xl">
-            <Logo size="lg" className="text-white mb-6" />
-            <h1 className="text-4xl font-bold text-white mb-4">Welcome back to Presence</h1>
-            <p className="text-lg text-white/80">
-              Access your attendance dashboard and management tools with secure authentication.
-            </p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 relative overflow-hidden">
+      {/* Animated background effects */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl animate-pulse-subtle" />
+        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse-subtle" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse-subtle" style={{ animationDelay: '2s' }} />
       </div>
-      
-      {/* Form Section */}
-      <div className="flex items-center justify-center p-6 md:p-12">
-        <div className="w-full max-w-md space-y-8 animate-fade-in">
-          <div className="text-center lg:text-left">
-            <div className="lg:hidden">
-              <Logo className="mx-auto lg:mx-0 mb-6" />
+
+      <div className="relative min-h-screen flex items-center justify-center p-6">
+        <div className="w-full max-w-md space-y-8 animate-slide-in-up">
+          {/* Logo and Header */}
+          <div className="text-center space-y-4">
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <Logo className="text-cyan-400" />
+                <Sparkles className="absolute -top-2 -right-2 h-5 w-5 text-purple-400 animate-pulse" />
+              </div>
             </div>
-            <h2 className="text-2xl font-bold">Sign in to your account</h2>
-            <p className="mt-2 text-muted-foreground">
-              Enter your credentials to access the platform
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Welcome Back
+            </h1>
+            <p className="text-slate-400">
+              Sign in to access your attendance dashboard
             </p>
           </div>
-          
-          <Card className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
+
+          {/* Login Card */}
+          <Card className="glass-panel border-slate-700/50 p-8 space-y-6 backdrop-blur-xl bg-slate-900/60 shadow-2xl neon-glow-cyan">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Email Field */}
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="name@example.com" required />
+                <Label htmlFor="email" className="text-slate-300 flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-cyan-400" />
+                  Email
+                </Label>
+                <div className="relative group">
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="name@example.com" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-slate-800/50 border-slate-700 focus:border-cyan-500 focus:ring-cyan-500/50 text-white placeholder:text-slate-500 transition-all duration-300"
+                    required 
+                  />
+                  <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-cyan-500/0 via-cyan-500/0 to-cyan-500/0 group-focus-within:from-cyan-500/10 group-focus-within:via-cyan-500/5 group-focus-within:to-purple-500/10 transition-all duration-500 pointer-events-none" />
+                </div>
               </div>
-              
+
+              {/* Password Field */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password" className="text-slate-300 flex items-center gap-2">
+                    <Lock className="h-4 w-4 text-purple-400" />
+                    Password
+                  </Label>
                   <Link 
                     to="/forgot-password" 
-                    className="text-sm text-primary hover:text-primary/90 transition-colors"
+                    className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
                   >
                     Forgot password?
                   </Link>
                 </div>
-                <Input id="password" type="password" placeholder="••••••••" required />
+                <div className="relative group">
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    placeholder="••••••••" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-slate-800/50 border-slate-700 focus:border-purple-500 focus:ring-purple-500/50 text-white placeholder:text-slate-500 transition-all duration-300"
+                    required 
+                  />
+                  <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-500/0 via-purple-500/0 to-purple-500/0 group-focus-within:from-purple-500/10 group-focus-within:via-purple-500/5 group-focus-within:to-pink-500/10 transition-all duration-500 pointer-events-none" />
+                </div>
               </div>
-              
+
+              {/* Remember Me */}
               <div className="flex items-center space-x-2">
-                <Checkbox id="remember" />
+                <Checkbox id="remember" className="border-slate-600 data-[state=checked]:bg-cyan-500 data-[state=checked]:border-cyan-500" />
                 <label
                   htmlFor="remember"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm text-slate-400 cursor-pointer select-none"
                 >
-                  Remember me
+                  Remember me for 30 days
                 </label>
               </div>
-              
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <span className="h-4 w-4 mr-2 rounded-full border-2 border-current border-r-transparent animate-spin"></span>
-                    Signing in...
-                  </>
-                ) : (
-                  "Sign In"
-                )}
+
+              {/* Submit Button */}
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-semibold py-6 rounded-lg shadow-lg hover:shadow-cyan-500/50 transition-all duration-300 group relative overflow-hidden" 
+                disabled={isLoading}
+              >
+                <span className="relative z-10 flex items-center justify-center">
+                  {isLoading ? (
+                    <>
+                      <span className="h-5 w-5 mr-2 rounded-full border-2 border-white border-r-transparent animate-spin"></span>
+                      Signing in...
+                    </>
+                  ) : (
+                    "Sign In"
+                  )}
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </Button>
             </form>
-          </Card>
-          
-          <div className="text-center">
-            <p className="text-muted-foreground text-sm">
-              Don't have an account?{" "}
-              <Link to="/register" className="text-primary hover:text-primary/90 transition-colors font-medium">
-                Sign up
+
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-700"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-slate-900/60 text-slate-400">New to Presence?</span>
+              </div>
+            </div>
+
+            {/* Sign Up Link */}
+            <div className="text-center">
+              <Link 
+                to="/register" 
+                className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors inline-flex items-center gap-2 group"
+              >
+                Create an account
+                <Sparkles className="h-4 w-4 group-hover:rotate-180 transition-transform duration-500" />
               </Link>
-            </p>
-          </div>
+            </div>
+          </Card>
+
+          {/* Footer */}
+          <p className="text-center text-sm text-slate-500">
+            Secured with end-to-end encryption
+          </p>
         </div>
       </div>
     </div>
