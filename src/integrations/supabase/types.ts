@@ -10,160 +10,20 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
+    PostgrestVersion: "13.0.5"
   }
   public: {
     Tables: {
-      attendance_records: {
-        Row: {
-          confidence_score: number | null
-          created_at: string
-          device_info: Json | null
-          face_descriptor: string | null
-          id: string
-          image_url: string | null
-          recognized: boolean | null
-          status: string | null
-          timestamp: string
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          confidence_score?: number | null
-          created_at?: string
-          device_info?: Json | null
-          face_descriptor?: string | null
-          id?: string
-          image_url?: string | null
-          recognized?: boolean | null
-          status?: string | null
-          timestamp?: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          confidence_score?: number | null
-          created_at?: string
-          device_info?: Json | null
-          face_descriptor?: string | null
-          id?: string
-          image_url?: string | null
-          recognized?: boolean | null
-          status?: string | null
-          timestamp?: string
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      attendance_settings: {
-        Row: {
-          created_at: string
-          id: string
-          key: string
-          updated_at: string
-          value: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          key: string
-          updated_at?: string
-          value: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          key?: string
-          updated_at?: string
-          value?: string
-        }
-        Relationships: []
-      }
-      profiles: {
-        Row: {
-          avatar_url: string | null
-          created_at: string
-          department: string | null
-          display_name: string | null
-          employee_id: string | null
-          id: string
-          parent_email: string | null
-          parent_name: string | null
-          parent_phone: string | null
-          position: string | null
-          updated_at: string
-          user_id: string | null
-          username: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          department?: string | null
-          display_name?: string | null
-          employee_id?: string | null
-          id?: string
-          parent_email?: string | null
-          parent_name?: string | null
-          parent_phone?: string | null
-          position?: string | null
-          updated_at?: string
-          user_id?: string | null
-          username?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          created_at?: string
-          department?: string | null
-          display_name?: string | null
-          employee_id?: string | null
-          id?: string
-          parent_email?: string | null
-          parent_name?: string | null
-          parent_phone?: string | null
-          position?: string | null
-          updated_at?: string
-          user_id?: string | null
-          username?: string | null
-        }
-        Relationships: []
-      }
-      user_roles: {
-        Row: {
-          created_at: string
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
-      app_role: "admin" | "teacher" | "student"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -290,8 +150,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      app_role: ["admin", "teacher", "student"],
-    },
+    Enums: {},
   },
 } as const
