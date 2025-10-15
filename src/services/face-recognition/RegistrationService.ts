@@ -96,7 +96,7 @@ export const registerFace = async (
     // Create device info as a plain object that conforms to Json type
     const deviceInfo: Record<string, any> = {
       type: 'webcam',
-      registration: true,
+      registration: 'true', // Must be string for RLS policy check
       metadata: {
         ...metadata,
         ...parentContactInfo
@@ -132,20 +132,21 @@ export const registerFace = async (
 
     // If RLS blocks it, try with anon access (for public registration)
     if (recordError && recordError.code === '42501') {
-      console.log('RLS blocked insert, attempting with service role context...');
+      console.log('RLS blocked insert, attempting public registration...');
       
       // Create a simplified record for public registration
       const publicInsertData = {
         user_id: null, // Use null for public registrations
         timestamp: new Date().toISOString(),
-        status: 'pending_approval' as const, // Different status to bypass RLS
+        status: 'pending_approval' as const, // Status that allows public registration
         device_info: {
           type: 'webcam',
-          registration: true,
+          registration: 'true', // Must be string for RLS policy
           metadata: deviceInfo.metadata,
           timestamp: deviceInfo.timestamp
         },
         image_url: imageUrl,
+        face_descriptor: faceDescriptorString,
       };
 
       const result = await supabase
