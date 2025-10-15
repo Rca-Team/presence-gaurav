@@ -14,7 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      attendance_records: {
+        Row: {
+          confidence_score: number | null
+          created_at: string
+          device_info: Json | null
+          face_descriptor: string | null
+          id: string
+          image_url: string | null
+          status: string
+          timestamp: string
+          user_id: string | null
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string
+          device_info?: Json | null
+          face_descriptor?: string | null
+          id?: string
+          image_url?: string | null
+          status?: string
+          timestamp?: string
+          user_id?: string | null
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string
+          device_info?: Json | null
+          face_descriptor?: string | null
+          id?: string
+          image_url?: string | null
+          status?: string
+          timestamp?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      attendance_settings: {
+        Row: {
+          created_at: string
+          id: string
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          parent_email: string | null
+          parent_name: string | null
+          parent_phone: string | null
+          updated_at: string
+          user_id: string | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          parent_email?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
+          updated_at?: string
+          user_id?: string | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          parent_email?: string | null
+          parent_name?: string | null
+          parent_phone?: string | null
+          updated_at?: string
+          user_id?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
