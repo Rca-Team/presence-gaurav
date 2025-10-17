@@ -7,6 +7,7 @@ export interface FaceInfo {
   employee_id: string;
   department: string;
   position: string;
+  image_url?: string;
 }
 
 export interface AttendanceRecord {

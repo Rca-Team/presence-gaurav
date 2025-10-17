@@ -8,9 +8,12 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Sun, Moon } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
 import { useTheme } from '@/hooks/use-theme';
+import { supabase } from '@/integrations/supabase/client';
+import ProfileDropdown from './ProfileDropdown';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
   const { theme, setTheme } = useTheme();
@@ -23,6 +26,20 @@ const Navbar = () => {
     
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    // Check initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const isActive = (path: string) => location.pathname === path;
@@ -68,7 +85,7 @@ const Navbar = () => {
           ))}
         </nav>
         
-        {/* Sign In / Get Started buttons - Only show on desktop */}
+        {/* Auth section - Only show on desktop */}
         <div className="hidden md:flex items-center space-x-4 animate-fade-in">
           <Toggle 
             pressed={theme === 'dark'} 
@@ -82,16 +99,22 @@ const Navbar = () => {
               <Sun className="h-5 w-5 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-500 rotate-0 scale-100 text-yellow-500 animate-pulse-subtle" />
             )}
           </Toggle>
-          <Link to="/login">
-            <Button variant="ghost" size="sm">
-              Sign In
-            </Button>
-          </Link>
-          <Link to="/register">
-            <Button size="sm" className="animate-pulse-subtle">
-              Get Started
-            </Button>
-          </Link>
+          {isAuthenticated ? (
+            <ProfileDropdown />
+          ) : (
+            <>
+              <Link to="/login">
+                <Button variant="ghost" size="sm">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/signup">
+                <Button size="sm" className="animate-pulse-subtle">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

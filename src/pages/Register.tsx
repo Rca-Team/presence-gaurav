@@ -282,19 +282,7 @@ const Register = () => {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Student Phone</Label>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      placeholder="+1234567890"
-                    />
-                  </div>
-                  
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="parentName">Parent/Guardian Name</Label>
                     <Input
@@ -390,18 +378,7 @@ const Register = () => {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="year">Current Year</Label>
-                    <Input
-                      id="year"
-                      name="year"
-                      value={formData.year}
-                      onChange={handleInputChange}
-                      placeholder="2023"
-                    />
-                  </div>
-                  
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="standing">Standing</Label>
                     <Select value={formData.standing} onValueChange={(value) => handleSelectChange('standing', value)}>
