@@ -74,7 +74,7 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
       const { data: registrationRecords, error } = await supabase
         .from('attendance_records')
         .select('id, device_info, timestamp, image_url')
-        .contains('device_info', { registration: true })
+        .eq('status', 'registered')
         .order('timestamp', { ascending: false });
 
       if (error) throw error;

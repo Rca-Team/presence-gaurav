@@ -35,7 +35,7 @@ const Admin = () => {
         const { data, error } = await supabase
           .from('attendance_records')
           .select('id, device_info')
-          .contains('device_info', { registration: true });
+          .eq('status', 'registered');
           
         if (error) throw error;
         

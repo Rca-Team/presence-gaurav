@@ -40,7 +40,7 @@ const ExistingUserContactPopup: React.FC = () => {
       const { data: registrationRecords, error } = await supabase
         .from('attendance_records')
         .select('device_info, user_id, id')
-        .contains('device_info', { registration: true });
+        .eq('status', 'registered');
 
       if (error) throw error;
 
@@ -112,7 +112,7 @@ const ExistingUserContactPopup: React.FC = () => {
         .from('attendance_records')
         .select('device_info, id')
         .eq('user_id', selectedUser.id)
-        .contains('device_info', { registration: true })
+        .eq('status', 'registered')
         .single();
 
       if (fetchError) throw fetchError;

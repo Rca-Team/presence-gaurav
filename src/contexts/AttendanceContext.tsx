@@ -95,7 +95,7 @@ export const AttendanceProvider: React.FC<{ children: React.ReactNode }> = ({ ch
                   const { data: registrationData } = await supabase
                     .from('attendance_records')
                     .select('device_info')
-                    .contains('device_info', { registration: true })
+                    .eq('status', 'registered')
                     .eq('user_id', record.user_id)
                     .maybeSingle();
                     

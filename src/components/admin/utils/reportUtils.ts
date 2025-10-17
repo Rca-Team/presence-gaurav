@@ -51,7 +51,7 @@ export const generatePrintableReport = async ({
     .from('attendance_records')
     .select('*')
     .eq('id', selectedFace.recordId) // Use the record ID to fetch the registration record
-    .contains('device_info', { registration: true })
+    .eq('status', 'registered')
     .single();
 
   if (regError || !registrationRecord) {
@@ -454,7 +454,7 @@ export const exportToCSV = async ({
     .from('attendance_records')
     .select('*')
     .eq('id', selectedFace.recordId) // Use the record ID to fetch the registration record
-    .contains('device_info', { registration: true })
+    .eq('status', 'registered')
     .single();
 
   if (regError || !registrationRecord) {
