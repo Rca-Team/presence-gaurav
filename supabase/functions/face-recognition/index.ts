@@ -26,6 +26,42 @@ serve(async (req) => {
     
     const { operation, userId, cutoffTime } = await req.json()
     
+    // Operations that require admin authentication
+    const adminOperations = ['updateAttendanceCutoffTime'];
+    
+    if (adminOperations.includes(operation)) {
+      // Verify user is authenticated
+      const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+      
+      if (authError || !user) {
+        return new Response(
+          JSON.stringify({ error: 'Unauthorized - Authentication required' }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 401,
+          }
+        );
+      }
+
+      // Check if user is admin
+      const { data: roleData, error: roleError } = await supabaseClient
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .single();
+
+      if (roleError || !roleData) {
+        return new Response(
+          JSON.stringify({ error: 'Forbidden - Admin access required' }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 403,
+          }
+        );
+      }
+    }
+    
     // Health check endpoint for model status
     if (operation === 'healthCheck') {
       return new Response(
