@@ -18,15 +18,23 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
-  // Check if user is already logged in
+  // Check if user is already logged in and handle OAuth callback
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    // Set up auth state listener first
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
         navigate('/dashboard');
       }
-    };
-    checkUser();
+    });
+
+    // Then check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/dashboard');
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
   
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
