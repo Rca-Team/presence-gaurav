@@ -73,7 +73,7 @@ const Login = () => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: 'https://0269fbb8-b223-4b0d-8bbc-229e85125d05.lovableproject.com/dashboard',
         },
       });
 
