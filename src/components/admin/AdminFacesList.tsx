@@ -156,6 +156,13 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
           clearTimeout(updateTimeout);
           updateTimeout = setTimeout(() => {
             fetchRegisteredFaces();
+            // Also refresh attendance counts for all faces
+            const uniqueEmployeeIds = [...new Set(faces.map(face => face.employee_id))];
+            Promise.all(
+              uniqueEmployeeIds.map(employeeId => fetchAttendanceCount(employeeId))
+            ).catch(error => {
+              console.error('Error fetching attendance counts on update:', error);
+            });
           }, 1000); // Wait 1 second before updating
         }
       )
@@ -169,16 +176,23 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
 
   const fetchAttendanceCount = async (employeeId: string) => {
     try {
-      // Use count() for better performance
-      const { count, error } = await supabase
+      // Fetch attendance records to count unique days
+      const { data, error } = await supabase
         .from('attendance_records')
-        .select('*', { count: 'exact', head: true })
+        .select('timestamp')
         .eq('status', 'present')
         .contains('device_info', { employee_id: employeeId });
 
       if (error) throw error;
 
-      const attendanceCount = count || 0;
+      // Count unique days by converting timestamps to date strings
+      const uniqueDays = new Set(
+        (data || []).map(record => 
+          new Date(record.timestamp).toLocaleDateString()
+        )
+      );
+      
+      const attendanceCount = uniqueDays.size;
 
       setAttendanceCounts(prev => ({
         ...prev,
@@ -355,11 +369,11 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
                      </div>
                    </div>
                    <p className="text-sm text-muted-foreground">{face.department}</p>
-                   <div className="flex items-center justify-between pt-2 text-sm">
-                     <div className="flex items-center gap-1">
-                       <UserCheck className="h-4 w-4 text-green-500" />
-                       <span>{face.total_attendance} attendances</span>
-                     </div>
+                    <div className="flex items-center justify-between pt-2 text-sm">
+                      <div className="flex items-center gap-1">
+                        <UserCheck className="h-4 w-4 text-green-500" />
+                        <span className="font-medium">{face.total_attendance} {face.total_attendance === 1 ? 'day' : 'days'}</span>
+                      </div>
                      <div className="flex items-center gap-1">
                        <Calendar className="h-4 w-4" />
                        <span>Last: {
