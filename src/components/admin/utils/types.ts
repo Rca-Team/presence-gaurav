@@ -14,6 +14,8 @@ export interface AttendanceRecord {
   id: string;
   timestamp: string;
   status: string;
+  name?: string;
+  image_url?: string;
 }
 
 export type SetDatesFunction = Dispatch<SetStateAction<Date[]>>;

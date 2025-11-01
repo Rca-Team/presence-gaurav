@@ -133,9 +133,19 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ isLoading, activityData
             return (
               <div key={`${item.id}-${index}`} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <span className="text-primary font-medium">{name.charAt(0)}</span>
-                  </div>
+                  <img 
+                    src={item.image_url && item.image_url.startsWith('data:') 
+                      ? item.image_url 
+                      : item.image_url
+                        ? `https://tegpyalokurixuvgeuks.supabase.co/storage/v1/object/public/face-images/${item.image_url}`
+                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=40`
+                    } 
+                    alt={name} 
+                    className="w-10 h-10 rounded-full object-cover border-2 border-border"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=40`;
+                    }}
+                  />
                   <div>
                     <p className="font-medium">{name}</p>
                     <p className="text-sm text-muted-foreground">{time}</p>

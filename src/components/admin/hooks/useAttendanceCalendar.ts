@@ -17,6 +17,7 @@ interface AttendanceRecord {
   timestamp: string;
   status: string;
   name?: string;
+  image_url?: string;
 }
 
 export const useAttendanceCalendar = (selectedFaceId: string | null) => {
@@ -128,7 +129,8 @@ export const useAttendanceCalendar = (selectedFaceId: string | null) => {
               id: record.id,
               timestamp: record.timestamp,
               status: record.status.toLowerCase(),
-              name: record.name
+              name: record.name,
+              image_url: record.image_url
             })));
           }
         }
@@ -222,7 +224,7 @@ export const useAttendanceCalendar = (selectedFaceId: string | null) => {
       
       const { data: records } = await supabase
         .from('attendance_records')
-        .select('id, timestamp, status, device_info')
+        .select('id, timestamp, status, device_info, image_url')
         .or(`user_id.eq.${faceId},id.eq.${faceId}`)
         .order('timestamp', { ascending: false });
         
@@ -263,7 +265,8 @@ export const useAttendanceCalendar = (selectedFaceId: string | null) => {
             id: record.id,
             timestamp: record.timestamp,
             status: typeof record.status === 'string' ? record.status.toLowerCase() : 'unknown',
-            name
+            name,
+            image_url: (record as any).image_url
           });
         }
         

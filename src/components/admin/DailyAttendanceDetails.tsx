@@ -2,7 +2,7 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { UserCheck, Clock, X } from 'lucide-react';
+import { UserCheck, Clock, X, User } from 'lucide-react';
 import { useAttendance } from '@/contexts/AttendanceContext';
 
 interface DailyAttendanceDetailsProps {
@@ -12,6 +12,7 @@ interface DailyAttendanceDetailsProps {
     timestamp: string;
     status: string;
     name?: string;
+    image_url?: string;
   }[];
   isDateInArray: (date: Date, dateArray: Date[]) => boolean;
   attendanceDays: Date[];
@@ -155,7 +156,22 @@ const DailyAttendanceDetails: React.FC<DailyAttendanceDetailsProps> = ({
           {/* Group by person name */}
           {Object.entries(groupedRealtimeAttendance).map(([name, records]) => (
             <div key={name} className="bg-muted/30 rounded-md p-3">
-              <h4 className="font-medium text-sm mb-2">{name}</h4>
+              <div className="flex items-center gap-3 mb-2">
+                <img 
+                  src={records[0]?.image_url && records[0].image_url.startsWith('data:') 
+                    ? records[0].image_url 
+                    : records[0]?.image_url
+                      ? `https://tegpyalokurixuvgeuks.supabase.co/storage/v1/object/public/face-images/${records[0].image_url}`
+                      : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=32`
+                  } 
+                  alt={name} 
+                  className="h-8 w-8 rounded-full object-cover border-2 border-border"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=32`;
+                  }}
+                />
+                <h4 className="font-medium text-sm">{name}</h4>
+              </div>
               <div className="space-y-2">
                 {records.map((record) => (
                   <div key={record.id} className="flex items-center justify-between p-2 bg-muted/50 rounded-md animate-fade-in">
@@ -185,7 +201,22 @@ const DailyAttendanceDetails: React.FC<DailyAttendanceDetailsProps> = ({
           {/* Group by person name */}
           {Object.entries(groupedDailyAttendance).map(([name, records]) => (
             <div key={name} className="bg-muted/30 rounded-md p-3">
-              <h4 className="font-medium text-sm mb-2">{name}</h4>
+              <div className="flex items-center gap-3 mb-2">
+                <img 
+                  src={records[0]?.image_url && records[0].image_url.startsWith('data:') 
+                    ? records[0].image_url 
+                    : records[0]?.image_url
+                      ? `https://tegpyalokurixuvgeuks.supabase.co/storage/v1/object/public/face-images/${records[0].image_url}`
+                      : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=32`
+                  } 
+                  alt={name} 
+                  className="h-8 w-8 rounded-full object-cover border-2 border-border"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=32`;
+                  }}
+                />
+                <h4 className="font-medium text-sm">{name}</h4>
+              </div>
               <div className="space-y-2">
                 {records.map((record) => (
                   <div key={record.id} className="flex items-center justify-between p-2 bg-muted/50 rounded-md animate-fade-in">

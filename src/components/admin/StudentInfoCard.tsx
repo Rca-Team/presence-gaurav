@@ -20,23 +20,19 @@ const StudentInfoCard: React.FC<StudentInfoCardProps> = ({
     <Card>
       <CardHeader>
         <div className="flex items-center gap-4">
-          {selectedFace?.image_url ? (
-            <img 
-              src={selectedFace.image_url.startsWith('data:') 
-                ? selectedFace.image_url 
-                : `https://zovwmlqnrsionbolcpng.supabase.co/storage/v1/object/public/face-images/${selectedFace.image_url}`
-              } 
-              alt={selectedFace.name} 
-              className="h-16 w-16 rounded-full object-cover border-2 border-border"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedFace?.name || 'Student')}&background=random&size=64`;
-              }}
-            />
-          ) : (
-            <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center border-2 border-border">
-              <User className="h-8 w-8 text-muted-foreground" />
-            </div>
-          )}
+          <img 
+            src={selectedFace?.image_url && selectedFace.image_url.startsWith('data:') 
+              ? selectedFace.image_url 
+              : selectedFace?.image_url
+                ? `https://tegpyalokurixuvgeuks.supabase.co/storage/v1/object/public/face-images/${selectedFace.image_url}`
+                : `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedFace?.name || 'Student')}&background=random&size=64`
+            } 
+            alt={selectedFace?.name || 'Student'} 
+            className="h-16 w-16 rounded-full object-cover border-2 border-border"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedFace?.name || 'Student')}&background=random&size=64`;
+            }}
+          />
           <CardTitle>{selectedFace?.name || 'Student'}</CardTitle>
         </div>
       </CardHeader>

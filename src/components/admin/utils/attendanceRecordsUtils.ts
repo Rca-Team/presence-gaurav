@@ -148,7 +148,7 @@ export const fetchDailyAttendance = async (
     // First try to fetch records where id equals faceId
     let { data: recordsById, error: errorById } = await supabase
       .from('attendance_records')
-      .select('id, timestamp, status, device_info, user_id')  // Explicitly include user_id here
+      .select('id, timestamp, status, device_info, user_id, image_url')  // Include image_url
       .eq('id', faceId)
       .gte('timestamp', timestampStart)
       .lte('timestamp', timestampEnd)
@@ -157,7 +157,7 @@ export const fetchDailyAttendance = async (
     // Then try to fetch records where user_id equals faceId
     let { data: recordsByUserId, error: errorByUserId } = await supabase
       .from('attendance_records')
-      .select('id, timestamp, status, device_info, user_id')  // Explicitly include user_id here
+      .select('id, timestamp, status, device_info, user_id, image_url')  // Include image_url
       .eq('user_id', faceId)
       .gte('timestamp', timestampStart)
       .lte('timestamp', timestampEnd)
@@ -222,6 +222,7 @@ export const fetchDailyAttendance = async (
         return {
           ...record,
           name,
+          image_url: (record as any).image_url,
           status: typeof record.status === 'string' ? 
             record.status.toLowerCase() === 'unauthorized' ? 'present' : record.status.toLowerCase() 
             : 'unknown'
