@@ -27,6 +27,7 @@ const MobileSidebar = () => {
   const navigation = [
     { name: 'Home', path: '/', icon: Home },
     { name: 'Dashboard', path: '/dashboard', icon: BarChart },
+    { name: 'Profile', path: '/profile', icon: User },
     { name: 'Register', path: '/register', icon: UserPlus },
     { name: 'Attendance', path: '/attendance', icon: Clock },
     { name: 'Admin', path: '/admin', icon: ShieldCheck },

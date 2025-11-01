@@ -65,16 +65,16 @@ const Navbar = () => {
           {[
             { text: 'Home', path: '/' },
             { text: 'Dashboard', path: '/dashboard' },
+            { text: 'Profile', path: '/profile' },
             { text: 'Register', path: '/register' },
             { text: 'Attendance', path: '/attendance' },
             { text: 'Admin', path: '/admin' },
-            { text: 'Notifications', path: '/notifications' },
           ].map((item) => (
             <Link
               key={item.path}
               to={item.path}
               className={cn(
-                "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                "px-4 py-2 rounded-lg text-sm font-medium transition-colors mobile-touch-target",
                 isActive(item.path)
                   ? "text-primary bg-primary/10"
                   : "text-muted-foreground hover:text-foreground hover:bg-accent"

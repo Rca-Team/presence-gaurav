@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import PageLayout from '@/components/layouts/PageLayout';
 import { PageHeader } from '@/components/ui/page-header';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   Layout, 
   BarChart3, 
@@ -21,6 +22,7 @@ import RecentActivity from '@/components/dashboard/RecentActivity';
 import StatusChart from '@/components/dashboard/StatusChart';
 import RegisteredFaces from '@/components/dashboard/RegisteredFaces';
 import CutoffTimeDisplay from '@/components/dashboard/CutoffTimeDisplay';
+import AIInsightsCard from '@/components/dashboard/AIInsightsCard';
 
 // Import services
 import { 
@@ -29,7 +31,14 @@ import {
 } from '@/services/dashboard/dashboardService';
 
 const Dashboard = () => {
-  // Fetch attendance data using react-query
+  const [currentUser, setCurrentUser] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setCurrentUser(user);
+    });
+  }, []);
+  // Real-time attendance data with Supabase subscriptions
   const { 
     data, 
     isLoading, 
@@ -38,8 +47,31 @@ const Dashboard = () => {
   } = useQuery({
     queryKey: ['dashboardStats'],
     queryFn: fetchAttendanceStats,
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 10000, // Faster polling for more real-time feel
   });
+
+  // Setup real-time subscription
+  React.useEffect(() => {
+    const channel = supabase
+      .channel('attendance-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'attendance_records'
+        },
+        () => {
+          console.log('Real-time update detected, refetching...');
+          refetchStats();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refetchStats]);
   
   // Create a memoized refetch function
   const refetchDashboard = useCallback(() => {
@@ -158,6 +190,11 @@ const Dashboard = () => {
             faces={registeredFaces} 
             refetchFaces={refetchFaces} 
           />
+        </div>
+
+        {/* AI Insights Card */}
+        <div className="animate-slide-in-up mt-6" style={{ animationDelay: '0.5s' }}>
+          <AIInsightsCard userId={currentUser?.id} />
         </div>
       </div>
     </PageLayout>

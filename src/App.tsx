@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Admin from './pages/Admin';
 import Contact from './pages/Contact';
 import NotificationDemo from './pages/NotificationDemo';
+import Profile from './pages/Profile';
 import SplashAnimation from "./components/SplashAnimation";
 import { AttendanceProvider } from './contexts/AttendanceContext';
 import { AnimatePresence } from 'framer-motion';
@@ -58,6 +59,11 @@ function AnimatedRoutes() {
         <Route path="/notifications" element={
           <ProtectedRoute requireAdmin={true}>
             <NotificationDemo />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         } />
         <Route path="*" element={<NotFound />} />
