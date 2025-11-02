@@ -26,6 +26,7 @@ interface AdminFacesListProps {
 
 interface RegisteredFace {
   id: string;
+  user_id?: string;
   name: string;
   employee_id: string;
   department: string;
@@ -70,10 +71,10 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
     try {
       setIsLoading(true);
       
-      // Optimize query to reduce payload - include image_url
+      // Optimize query to reduce payload - include image_url and user_id
       const { data: registrationRecords, error } = await supabase
         .from('attendance_records')
-        .select('id, device_info, timestamp, image_url')
+        .select('id, user_id, device_info, timestamp, image_url')
         .eq('status', 'registered')
         .order('timestamp', { ascending: false });
 
@@ -88,6 +89,7 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
 
               const face: RegisteredFace = {
                 id: record.id,
+                user_id: (record as any).user_id,
                 name: metadata.name || 'Unknown',
                 employee_id: metadata.employee_id || 'N/A',
                 department: metadata.department || 'N/A',
@@ -383,11 +385,11 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
                        }</span>
                      </div>
                    </div>
-                   <div className="pt-2" onClick={(e) => e.stopPropagation()}>
-                     <NotificationService 
-                       studentId={face.id} 
-                       studentName={face.name}
-                       attendanceStatus="present"
+                    <div className="pt-2" onClick={(e) => e.stopPropagation()}>
+                      <NotificationService 
+                        studentId={face.user_id} 
+                        studentName={face.name}
+                        attendanceStatus="present"
                      />
                    </div>
                  </div>
@@ -453,10 +455,10 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
                     </td>
                     <td className="py-3 px-4 text-right">
                        <div className="flex items-center gap-1 justify-end">
-                         <NotificationService 
-                           studentId={face.id} 
-                           studentName={face.name}
-                           attendanceStatus="present"
+                          <NotificationService 
+                            studentId={face.user_id} 
+                            studentName={face.name}
+                            attendanceStatus="present"
                          />
                          <DropdownMenu>
                         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>

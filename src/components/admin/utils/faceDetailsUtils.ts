@@ -67,6 +67,7 @@ export const fetchSelectedFace = async (faceId: string): Promise<FaceInfo> => {
         
         return {
           recordId: faceId,
+          user_id: data.user_id,
           name: metadata.name || 'Unknown Student',
           employee_id: metadata.employee_id || data.user_id || faceId,
           department: metadata.department || 'N/A',
@@ -76,6 +77,7 @@ export const fetchSelectedFace = async (faceId: string): Promise<FaceInfo> => {
       
       return {
         recordId: faceId,
+        user_id: data.user_id,
         name: 'Unknown Student',
         employee_id: data.user_id || faceId,
         department: 'N/A',

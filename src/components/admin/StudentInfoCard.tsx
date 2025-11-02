@@ -58,7 +58,7 @@ const StudentInfoCard: React.FC<StudentInfoCardProps> = ({
           </div>
           <div className="pt-4 border-t">
             <NotificationService 
-              studentId={selectedFace?.employee_id}
+              studentId={selectedFace?.user_id}
               studentName={selectedFace?.name}
               attendanceStatus="present"
             />
