@@ -47,11 +47,12 @@ const handler = async (req: Request): Promise<Response> => {
         recipientPhone = profile.parent_phone;
         console.log("Found phone in profiles:", recipientPhone);
       } else {
-        // Try to get from attendance_records
+        // Try to get from attendance_records - look for registered status which has parent info
         const { data: attendance, error: attendanceError } = await supabase
           .from("attendance_records")
           .select("device_info")
           .eq("user_id", studentId)
+          .eq("status", "registered")
           .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle();
