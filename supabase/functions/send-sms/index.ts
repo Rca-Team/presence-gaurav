@@ -37,12 +37,12 @@ const handler = async (req: Request): Promise<Response> => {
       // First try to get phone from profiles
       const { data: profile } = await supabase
         .from("profiles")
-        .select("parent_contact")
+        .select("parent_phone")
         .eq("user_id", studentId)
         .single();
 
-      if (profile?.parent_contact) {
-        recipientPhone = profile.parent_contact;
+      if (profile?.parent_phone) {
+        recipientPhone = profile.parent_phone;
       } else {
         // Try to get from attendance_records
         const { data: attendance } = await supabase
