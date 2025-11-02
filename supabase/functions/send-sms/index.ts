@@ -54,7 +54,7 @@ const handler = async (req: Request): Promise<Response> => {
           .single();
 
         if (attendance?.device_info) {
-          const deviceInfo = JSON.parse(attendance.device_info);
+          const deviceInfo = attendance.device_info as any;
           recipientPhone = deviceInfo.phone_number;
         }
       }
