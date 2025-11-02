@@ -35,27 +35,34 @@ const handler = async (req: Request): Promise<Response> => {
     // If phone not provided but studentId is, fetch from database
     if (!recipientPhone && studentId) {
       // First try to get phone from profiles
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("parent_phone")
         .eq("user_id", studentId)
-        .single();
+        .maybeSingle();
+
+      console.log("Profile query result:", { profile, profileError, studentId });
 
       if (profile?.parent_phone) {
         recipientPhone = profile.parent_phone;
+        console.log("Found phone in profiles:", recipientPhone);
       } else {
         // Try to get from attendance_records
-        const { data: attendance } = await supabase
+        const { data: attendance, error: attendanceError } = await supabase
           .from("attendance_records")
           .select("device_info")
           .eq("user_id", studentId)
           .order("created_at", { ascending: false })
           .limit(1)
-          .single();
+          .maybeSingle();
+
+        console.log("Attendance query result:", { attendance, attendanceError });
 
         if (attendance?.device_info) {
           const deviceInfo = attendance.device_info as any;
+          console.log("Device info:", deviceInfo);
           recipientPhone = deviceInfo.phone_number;
+          console.log("Found phone in attendance:", recipientPhone);
         }
       }
     }
