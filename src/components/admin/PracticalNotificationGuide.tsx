@@ -50,7 +50,7 @@ const PracticalNotificationGuide = () => {
         'Field trip departures'
       ],
       timing: 'Immediately when face is recognized',
-      channels: ['Email', 'SMS']
+      channels: ['Email']
     },
     {
       id: 'late',
@@ -67,7 +67,7 @@ const PracticalNotificationGuide = () => {
         'Parent communication'
       ],
       timing: 'When student arrives after 9:00 AM (configurable)',
-      channels: ['Email', 'SMS']
+      channels: ['Email']
     },
     {
       id: 'absent',
@@ -84,7 +84,7 @@ const PracticalNotificationGuide = () => {
         'Emergency situations'
       ],
       timing: 'After morning attendance window closes',
-      channels: ['Email', 'SMS', 'Phone Call']
+      channels: ['Email']
     },
     {
       id: 'unauthorized',
@@ -101,7 +101,7 @@ const PracticalNotificationGuide = () => {
         'Emergency lockdown triggers'
       ],
       timing: 'Immediately upon detection',
-      channels: ['SMS', 'Email', 'Phone Call', 'Security Alert']
+      channels: ['Email']
     }
   ];
 

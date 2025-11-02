@@ -6,8 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Mail, Send, MessageSquare } from 'lucide-react';
+import { Mail } from 'lucide-react';
 
 interface NotificationServiceProps {
   studentId?: string;
@@ -24,9 +23,7 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [subject, setSubject] = useState('');
-  const [smsMessage, setSmsMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [notificationType, setNotificationType] = useState<'email' | 'sms'>('email');
 
   const getDefaultMessage = () => {
     const status = attendanceStatus?.toLowerCase();
@@ -42,19 +39,6 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
 
   const getDefaultSubject = () => {
     return `School Attendance Notification - ${studentName}`;
-  };
-
-  const getDefaultSMSMessage = () => {
-    const status = attendanceStatus?.toLowerCase();
-    const name = studentName || 'your child';
-    if (status === 'present') {
-      return `${name} arrived safely at school at ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}.`;
-    } else if (status === 'late') {
-      return `${name} arrived late to school at ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}. Please ensure punctuality.`;
-    } else if (status === 'absent') {
-      return `${name} was marked absent on ${new Date().toLocaleDateString()}. Please contact school if unexpected.`;
-    }
-    return `Attendance update for ${name} - ${new Date().toLocaleDateString()}`;
   };
 
   const sendEmailNotification = async () => {
@@ -165,69 +149,10 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
     }
   };
 
-  const sendSMSNotification = async () => {
-    if (!studentId) {
-      toast({
-        title: "Error",
-        description: "Student ID is required",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!smsMessage.trim()) {
-      toast({
-        title: "Error",
-        description: "SMS message cannot be empty",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('send-sms', {
-        body: {
-          studentId: studentId,
-          message: smsMessage,
-          studentName: studentName
-        }
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "SMS Notification Sent",
-        description: "SMS notification sent successfully to parent.",
-      });
-      
-      setOpen(false);
-      setSmsMessage('');
-    } catch (error: any) {
-      console.error('Error sending SMS:', error);
-      toast({
-        title: "SMS Failed",
-        description: error.message || "Failed to send SMS. Please check parent phone number.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const sendNotification = async () => {
-    if (notificationType === 'email') {
-      await sendEmailNotification();
-    } else {
-      await sendSMSNotification();
-    }
-  };
-
   React.useEffect(() => {
     if (open) {
       setMessage(getDefaultMessage());
       setSubject(getDefaultSubject());
-      setSmsMessage(getDefaultSMSMessage());
     }
   }, [open, studentName, attendanceStatus]);
 
@@ -235,88 +160,53 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          <Send className="h-4 w-4 mr-2" />
+          <Mail className="h-4 w-4 mr-2" />
           Notify Parent
         </Button>
       </DialogTrigger>
       
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Send Notification to Parent</DialogTitle>
+          <DialogTitle>Send Email Notification to Parent</DialogTitle>
         </DialogHeader>
         
-        <Tabs defaultValue="email" onValueChange={(v) => setNotificationType(v as 'email' | 'sms')}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="email" className="flex items-center gap-2">
-              <Mail className="h-4 w-4" />
-              Email
-            </TabsTrigger>
-            <TabsTrigger value="sms" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              SMS
-            </TabsTrigger>
-          </TabsList>
+        <div className="space-y-4 pt-4">
+          <div className="space-y-2">
+            <Label htmlFor="subject">Email Subject</Label>
+            <Input
+              id="subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Enter email subject"
+            />
+          </div>
           
-          <TabsContent value="email" className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label htmlFor="subject">Email Subject</Label>
-              <Input
-                id="subject"
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                placeholder="Enter email subject"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="message">Email Message</Label>
-              <Textarea
-                id="message"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Enter email message"
-                rows={6}
-              />
-            </div>
-          </TabsContent>
+          <div className="space-y-2">
+            <Label htmlFor="message">Email Message</Label>
+            <Textarea
+              id="message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Enter email message"
+              rows={8}
+            />
+          </div>
+
+          <div className="rounded-lg bg-muted p-3 text-sm space-y-1">
+            <p className="font-medium">📧 Email Notifications:</p>
+            <p className="text-xs text-muted-foreground">Professional email notifications sent via Resend (3,000 free emails/month)</p>
+          </div>
           
-          <TabsContent value="sms" className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label htmlFor="sms-message">SMS Message</Label>
-              <Textarea
-                id="sms-message"
-                value={smsMessage}
-                onChange={(e) => setSmsMessage(e.target.value)}
-                placeholder="Keep it short (max 160 characters)..."
-                rows={4}
-                maxLength={160}
-              />
-              <p className="text-xs text-muted-foreground">
-                {smsMessage.length}/160 characters
-              </p>
-            </div>
-            <div className="rounded-lg bg-muted p-3 text-xs space-y-1">
-              <p className="font-medium">📱 SMS Requirements:</p>
-              <p>• Works only for Indian phone numbers (+91)</p>
-              <p>• Keep messages concise for better delivery</p>
-              <p>• Free service via Fast2SMS</p>
-            </div>
-          </TabsContent>
-          
-          <div className="flex justify-end space-x-2 pt-4">
+          <div className="flex justify-end space-x-2 pt-2">
             <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={sendNotification} disabled={isLoading}>
-              {notificationType === 'email' ? (
-                <Mail className="h-4 w-4 mr-2" />
-              ) : (
-                <MessageSquare className="h-4 w-4 mr-2" />
-              )}
-              {isLoading ? "Sending..." : notificationType === 'email' ? "Send Email" : "Send SMS"}
+            <Button onClick={sendEmailNotification} disabled={isLoading}>
+              <Mail className="h-4 w-4 mr-2" />
+              {isLoading ? "Sending..." : "Send Email"}
             </Button>
           </div>
-        </Tabs>
+        </div>
       </DialogContent>
     </Dialog>
   );
