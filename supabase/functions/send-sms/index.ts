@@ -61,7 +61,8 @@ const handler = async (req: Request): Promise<Response> => {
         if (attendance?.device_info) {
           const deviceInfo = attendance.device_info as any;
           console.log("Device info:", deviceInfo);
-          recipientPhone = deviceInfo.phone_number;
+          // Check both possible locations for phone number
+          recipientPhone = deviceInfo.metadata?.parent_phone || deviceInfo.phone_number;
           console.log("Found phone in attendance:", recipientPhone);
         }
       }
