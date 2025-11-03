@@ -77,11 +77,23 @@ School Administration`;
         try {
           const selectedFace = availableFaces.find(face => face.id === studentId);
           
-          // Mock parent info for demo - in production this would come from database
+          // Get real parent email from profiles table
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('parent_email, parent_name, display_name')
+            .or(`user_id.eq.${studentId},id.eq.${studentId}`)
+            .single();
+
+          // Only send if parent email exists
+          if (!profile?.parent_email || profile.parent_email.trim() === '') {
+            console.warn(`No parent email for student ${studentId}, skipping`);
+            errorCount++;
+            return;
+          }
+
           const parentInfo = {
-            parent_email: `parent.${selectedFace?.name?.toLowerCase().replace(' ', '.')}@example.com`,
-            parent_phone: '+1234567890',
-            parent_name: `Parent of ${selectedFace?.name}`
+            parent_email: profile.parent_email,
+            parent_name: profile.parent_name || `Parent of ${selectedFace?.name}`
           };
 
           // Call Supabase Edge Function for email notification

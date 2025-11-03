@@ -63,40 +63,13 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
         .or(`user_id.eq.${studentId},id.eq.${studentId}`)
         .single();
 
-      if (profile && (profile.parent_email || profile.display_name)) {
+      // Only use real parent email from profile - no demo emails
+      if (profile?.parent_email && profile.parent_email.trim() !== '') {
         parentInfo = {
-          parent_email: profile.parent_email || `demo.parent.${profile.display_name?.toLowerCase().replace(/\s+/g, '.')}@example.com`,
-          parent_phone: profile.parent_phone || '+1555-0123',
+          parent_email: profile.parent_email,
+          parent_phone: profile.parent_phone || '',
           parent_name: profile.parent_name || `Parent of ${profile.display_name || studentName}`
         };
-      } else {
-        // Try to get from attendance records device_info
-        const { data: attendanceData } = await supabase
-          .from('attendance_records')
-          .select('device_info')
-          .eq('user_id', studentId)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-
-        if (attendanceData?.device_info) {
-          const deviceInfo = typeof attendanceData.device_info === 'string' 
-            ? JSON.parse(attendanceData.device_info) 
-            : attendanceData.device_info;
-          
-          parentInfo = {
-            parent_email: deviceInfo.metadata?.parent_email || `demo.parent.${studentName?.toLowerCase().replace(/\s+/g, '.')}@example.com`,
-            parent_phone: deviceInfo.metadata?.parent_phone || '+1555-0123',
-            parent_name: deviceInfo.metadata?.parent_name || `Parent of ${studentName}`
-          };
-        } else {
-          // Fallback to demo data for testing
-          parentInfo = {
-            parent_email: `demo.parent.${studentName?.toLowerCase().replace(/\s+/g, '.')}@example.com`,
-            parent_phone: '+1555-0123',
-            parent_name: `Parent of ${studentName}`
-          };
-        }
       }
 
       if (!parentInfo) {
