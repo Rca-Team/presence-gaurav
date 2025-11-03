@@ -56,11 +56,11 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
       // Get parent contact information from attendance records or profiles
       let parentInfo = null;
       
-      // First try to get from profiles table using user_id
+      // First try to get from profiles table using user_id or id
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', studentId)
+        .or(`user_id.eq.${studentId},id.eq.${studentId}`)
         .single();
 
       if (profile && (profile.parent_email || profile.display_name)) {
