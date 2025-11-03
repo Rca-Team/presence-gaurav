@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -6,9 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail, Users, AlertCircle } from 'lucide-react';
+import { Mail, Users } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface BulkNotificationServiceProps {
   availableFaces: { id: string; name: string; employee_id: string }[];
@@ -22,7 +21,6 @@ const BulkNotificationService: React.FC<BulkNotificationServiceProps> = ({ avail
   const [isLoading, setIsLoading] = useState(false);
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
-  const [studentsWithoutEmail, setStudentsWithoutEmail] = useState<string[]>([]);
 
   const getDefaultMessage = () => {
     return `Dear Parent/Guardian,
@@ -150,33 +148,12 @@ School Administration`;
     }
   };
 
-  useEffect(() => {
-    const checkParentEmails = async () => {
-      if (open) {
-        const studentsWithoutEmails: string[] = [];
-        
-        for (const face of availableFaces) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('parent_email')
-            .or(`user_id.eq.${face.id},id.eq.${face.id}`)
-            .maybeSingle();
-          
-          if (!profile?.parent_email || profile.parent_email.trim() === '') {
-            studentsWithoutEmails.push(face.name);
-          }
-        }
-        
-        setStudentsWithoutEmail(studentsWithoutEmails);
-      }
-    };
-
+  React.useEffect(() => {
     if (open) {
       setMessage(getDefaultMessage());
       setSubject(getDefaultSubject());
-      checkParentEmails();
     }
-  }, [open, availableFaces]);
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -193,20 +170,6 @@ School Administration`;
         </DialogHeader>
         
         <div className="space-y-4">
-          {studentsWithoutEmail.length > 0 && (
-            <Alert>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription className="ml-2">
-                <p className="font-medium text-sm mb-1">⚠️ Missing Parent Emails</p>
-                <p className="text-xs">
-                  The following students don't have parent emails: <strong>{studentsWithoutEmail.join(', ')}</strong>
-                </p>
-                <p className="text-xs mt-1">
-                  They will be skipped. Please add parent emails in the <a href="https://supabase.com/dashboard/project/tegpyalokurixuvgeuks/editor/29584?schema=public" target="_blank" rel="noopener noreferrer" className="underline">Profiles table</a>.
-                </p>
-              </AlertDescription>
-            </Alert>
-          )}
           <div className="space-y-2">
             <Label htmlFor="subject">Email Subject</Label>
             <Input
