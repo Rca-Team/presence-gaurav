@@ -96,7 +96,7 @@ serve(async (req) => {
       console.log('Sending email to:', recipient.email);
       
       // Use verified domain for sending emails
-      const fromAddress = 'School Attendance <noreply@electronicgaurav.me>';
+      const fromAddress = 'School Attendance <presence@electronicgaurav.me>';
       
       const emailResponse = await resend.emails.send({
         from: fromAddress,
