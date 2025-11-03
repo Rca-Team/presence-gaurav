@@ -95,8 +95,8 @@ serve(async (req) => {
     try {
       console.log('Sending email to:', recipient.email);
       
-      // Use a more generic from address for better deliverability
-      const fromAddress = 'School Attendance <onboarding@resend.dev>';
+      // Use verified domain for sending emails
+      const fromAddress = 'School Attendance <noreply@electronicgaurav.me>';
       
       const emailResponse = await resend.emails.send({
         from: fromAddress,
