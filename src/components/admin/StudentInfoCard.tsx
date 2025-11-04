@@ -54,8 +54,12 @@ const StudentInfoCard: React.FC<StudentInfoCardProps> = ({
               <p>{selectedFace?.position || 'Student'}</p>
             </div>
             <div>
-              <span className="text-sm text-muted-foreground">Total Attendance:</span>
-              <p className="font-semibold text-primary">{attendanceDays.length + lateAttendanceDays.length} days</p>
+              <span className="text-sm text-muted-foreground">Present Days:</span>
+              <p className="font-semibold text-green-600">{attendanceDays.length} days</p>
+            </div>
+            <div>
+              <span className="text-sm text-muted-foreground">Late Days:</span>
+              <p className="font-semibold text-orange-600">{lateAttendanceDays.length} days</p>
             </div>
             {attendanceDays.length > 0 && (
               <div>
