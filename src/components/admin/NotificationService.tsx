@@ -60,12 +60,22 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
       // Get parent contact information from attendance records or profiles
       let parentInfo = null;
       
-      // First try to get from profiles table using user_id or id
-      const { data: profile } = await supabase
+      // Try to get profile by user_id first, then by id
+      let { data: profile } = await supabase
         .from('profiles')
         .select('*')
-        .or(`user_id.eq.${studentId},id.eq.${studentId}`)
-        .single();
+        .eq('user_id', studentId)
+        .maybeSingle();
+
+      // If not found, try by id
+      if (!profile) {
+        const result = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', studentId)
+          .maybeSingle();
+        profile = result.data;
+      }
 
       // Only use real parent email from profile - no demo emails
       if (profile?.parent_email && profile.parent_email.trim() !== '') {
@@ -129,11 +139,22 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
   useEffect(() => {
     const checkParentDetails = async () => {
       if (open && studentId) {
-        const { data: profile } = await supabase
+        // Try to get profile by user_id first, then by id
+        let { data: profile } = await supabase
           .from('profiles')
           .select('parent_email, parent_name')
-          .or(`user_id.eq.${studentId},id.eq.${studentId}`)
+          .eq('user_id', studentId)
           .maybeSingle();
+
+        // If not found, try by id
+        if (!profile) {
+          const result = await supabase
+            .from('profiles')
+            .select('parent_email, parent_name')
+            .eq('id', studentId)
+            .maybeSingle();
+          profile = result.data;
+        }
         
         setHasParentEmail(!!(profile?.parent_email && profile.parent_email.trim() !== ''));
         setParentEmail(profile?.parent_email || '');
@@ -158,29 +179,56 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
       return;
     }
 
+    setIsLoading(true);
     try {
-      const { error } = await supabase
+      // First try to update by user_id
+      let { data, error, count } = await supabase
         .from('profiles')
         .update({
           parent_email: parentEmail.trim(),
           parent_name: parentName.trim() || null
         })
-        .or(`user_id.eq.${studentId},id.eq.${studentId}`);
+        .eq('user_id', studentId)
+        .select();
 
-      if (error) throw error;
+      // If no rows updated, try by id
+      if ((!data || data.length === 0) && !error) {
+        const result = await supabase
+          .from('profiles')
+          .update({
+            parent_email: parentEmail.trim(),
+            parent_name: parentName.trim() || null
+          })
+          .eq('id', studentId)
+          .select();
+        
+        data = result.data;
+        error = result.error;
+      }
+
+      if (error) {
+        console.error('Database error:', error);
+        throw new Error(error.message);
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error('Student profile not found. Please ensure the student is registered.');
+      }
 
       setHasParentEmail(true);
       toast({
         title: "Success",
-        description: "Parent details saved successfully",
+        description: "Parent details saved successfully. You can now send notifications.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving parent details:', error);
       toast({
-        title: "Error",
-        description: "Failed to save parent details",
+        title: "Failed to Save",
+        description: error.message || "Could not save parent details. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 

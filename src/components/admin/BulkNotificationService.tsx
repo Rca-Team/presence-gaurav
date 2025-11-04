@@ -80,11 +80,22 @@ School Administration`;
           const selectedFace = availableFaces.find(face => face.id === studentId);
           
           // Get real parent email from profiles table
-          const { data: profile } = await supabase
+          // Try to get profile by user_id first, then by id
+          let { data: profile } = await supabase
             .from('profiles')
             .select('parent_email, parent_name, display_name')
-            .or(`user_id.eq.${studentId},id.eq.${studentId}`)
-            .single();
+            .eq('user_id', studentId)
+            .maybeSingle();
+
+          // If not found, try by id
+          if (!profile) {
+            const result = await supabase
+              .from('profiles')
+              .select('parent_email, parent_name, display_name')
+              .eq('id', studentId)
+              .maybeSingle();
+            profile = result.data;
+          }
 
           // Only send if parent email exists
           if (!profile?.parent_email || profile.parent_email.trim() === '') {
@@ -156,11 +167,22 @@ School Administration`;
         const studentsWithoutEmails: string[] = [];
         
         for (const face of availableFaces) {
-          const { data: profile } = await supabase
+          // Try to get profile by user_id first, then by id
+          let { data: profile } = await supabase
             .from('profiles')
             .select('parent_email')
-            .or(`user_id.eq.${face.id},id.eq.${face.id}`)
+            .eq('user_id', face.id)
             .maybeSingle();
+
+          // If not found, try by id
+          if (!profile) {
+            const result = await supabase
+              .from('profiles')
+              .select('parent_email')
+              .eq('id', face.id)
+              .maybeSingle();
+            profile = result.data;
+          }
           
           if (!profile?.parent_email || profile.parent_email.trim() === '') {
             studentsWithoutEmails.push(face.name);
