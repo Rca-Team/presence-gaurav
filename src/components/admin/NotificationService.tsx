@@ -182,7 +182,7 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
     setIsLoading(true);
     try {
       // First try to update by user_id
-      let { data, error, count } = await supabase
+      let { data, error } = await supabase
         .from('profiles')
         .update({
           parent_email: parentEmail.trim(),
@@ -206,13 +206,25 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
         error = result.error;
       }
 
+      // If still no match, create a new profile
+      if ((!data || data.length === 0) && !error) {
+        const insertResult = await supabase
+          .from('profiles')
+          .insert({
+            user_id: studentId,
+            display_name: studentName || 'Student',
+            parent_email: parentEmail.trim(),
+            parent_name: parentName.trim() || null
+          })
+          .select();
+        
+        data = insertResult.data;
+        error = insertResult.error;
+      }
+
       if (error) {
         console.error('Database error:', error);
         throw new Error(error.message);
-      }
-
-      if (!data || data.length === 0) {
-        throw new Error('Student profile not found. Please ensure the student is registered.');
       }
 
       setHasParentEmail(true);

@@ -34,7 +34,7 @@ const Admin = () => {
       try {
         const { data, error } = await supabase
           .from('attendance_records')
-          .select('id, device_info')
+          .select('id, user_id, device_info')
           .eq('status', 'registered');
           
         if (error) throw error;
@@ -51,9 +51,12 @@ const Admin = () => {
                 return acc;
               }
               
-              // Check if we already have this name
-              if (!acc.some(face => face.name === name)) {
-                acc.push({ id: record.id, name, employee_id });
+              // Use user_id if available, otherwise use record id as fallback
+              const userId = record.user_id || record.id;
+              
+              // Check if we already have this user
+              if (!acc.some(face => face.id === userId)) {
+                acc.push({ id: userId, name, employee_id });
               }
               
               return acc;
