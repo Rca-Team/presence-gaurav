@@ -5,6 +5,7 @@ import { PageHeader } from '@/components/ui/page-header';
 import AdminFacesList from '@/components/admin/AdminFacesList';
 import AttendanceCalendar from '@/components/admin/AttendanceCalendar';
 import AttendanceCutoffSetting from '@/components/admin/AttendanceCutoffSetting';
+import AutoNotificationScheduler from '@/components/admin/AutoNotificationScheduler';
 import BulkNotificationService from '@/components/admin/BulkNotificationService';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -220,6 +221,7 @@ const Admin = () => {
         </TabsContent>
         <TabsContent value="settings" className="space-y-6">
           <AttendanceCutoffSetting />
+          <AutoNotificationScheduler />
         </TabsContent>
       </Tabs>
     </PageLayout>

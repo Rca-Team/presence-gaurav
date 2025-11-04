@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { Json } from '@/integrations/supabase/types';
 
@@ -133,19 +135,20 @@ const RecentActivity: React.FC<RecentActivityProps> = ({ isLoading, activityData
             return (
               <div key={`${item.id}-${index}`} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                 <div className="flex items-center gap-3">
-                  <img 
-                    src={item.image_url && item.image_url.startsWith('data:') 
-                      ? item.image_url 
-                      : item.image_url
-                        ? `https://tegpyalokurixuvgeuks.supabase.co/storage/v1/object/public/face-images/${item.image_url}`
-                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=40`
-                    } 
-                    alt={name} 
-                    className="w-10 h-10 rounded-full object-cover border-2 border-border"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=40`;
-                    }}
-                  />
+                  <Avatar className="w-10 h-10 border-2 border-border">
+                    <AvatarImage 
+                      src={item.image_url && item.image_url.startsWith('data:') 
+                        ? item.image_url 
+                        : item.image_url
+                          ? `https://tegpyalokurixuvgeuks.supabase.co/storage/v1/object/public/face-images/${item.image_url}`
+                          : undefined
+                      } 
+                      alt={name}
+                    />
+                    <AvatarFallback>
+                      <User className="h-5 w-5" />
+                    </AvatarFallback>
+                  </Avatar>
                   <div>
                     <p className="font-medium">{name}</p>
                     <p className="text-sm text-muted-foreground">{time}</p>

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -203,20 +204,15 @@ const RegisteredFaces: React.FC<RegisteredFacesProps> = ({
               {filteredFaces.map((face) => (
                 <tr key={face.id} className="border-b hover:bg-muted/50">
                   <td className="py-3 px-2">
-                    {face.image_url ? (
-                      <img 
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage 
                         src={face.image_url} 
-                        alt={face.name} 
-                        className="w-10 h-10 rounded-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${face.name}&background=random`;
-                        }}
+                        alt={face.name}
                       />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <AvatarFallback>
                         <span className="text-primary font-medium">{face.name.charAt(0)}</span>
-                      </div>
-                    )}
+                      </AvatarFallback>
+                    </Avatar>
                   </td>
                   <td className="py-3 px-2">
                     {editingFace === face.id ? (
