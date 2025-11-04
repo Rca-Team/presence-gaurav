@@ -247,7 +247,7 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
         </DialogHeader>
         
         <div className="space-y-4 pt-4">
-          {!hasParentEmail && (
+          {!hasParentEmail ? (
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="ml-2">
@@ -279,15 +279,16 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
                     <Button 
                       size="sm" 
                       onClick={handleSaveParentDetails}
+                      disabled={isLoading}
                       className="w-full mt-2"
                     >
-                      Save Parent Details
+                      {isLoading ? "Saving..." : "Save Parent Details"}
                     </Button>
                   </div>
                 </div>
               </AlertDescription>
             </Alert>
-          )}
+          ) : null}
 
           <div className="space-y-2">
             <Label htmlFor="subject">Email Subject</Label>
