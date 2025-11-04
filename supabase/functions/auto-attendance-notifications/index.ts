@@ -34,51 +34,40 @@ serve(async (req) => {
     const cutoffTime = cutoffData.value;
     const today = new Date().toISOString().split('T')[0];
 
-    // Get all registered users
-    const { data: registeredUsers } = await supabaseClient
-      .from('attendance_records')
-      .select('user_id, device_info')
-      .eq('status', 'registered');
+    // Get all registered users (users who have profile data)
+    const { data: profiles } = await supabaseClient
+      .from('profiles')
+      .select('user_id, display_name, parent_email, parent_name')
+      .not('parent_email', 'is', null);
 
-    if (!registeredUsers || registeredUsers.length === 0) {
+    if (!profiles || profiles.length === 0) {
       return new Response(
-        JSON.stringify({ message: 'No registered users found' }),
+        JSON.stringify({ message: 'No registered users with parent emails found' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Get today's attendance records
+    // Get today's attendance records for all users
     const { data: todayAttendance } = await supabaseClient
       .from('attendance_records')
-      .select('user_id, status, timestamp')
+      .select('user_id, status, timestamp, device_info')
       .gte('timestamp', `${today}T00:00:00`)
-      .lte('timestamp', `${today}T23:59:59`);
+      .lte('timestamp', `${today}T23:59:59`)
+      .neq('status', 'pending_approval');
 
     const notificationResults = [];
 
-    for (const user of registeredUsers) {
-      const userId = user.user_id;
-      const deviceInfo = user.device_info as any;
-      const studentName = deviceInfo?.metadata?.name || 'Student';
+    for (const profile of profiles) {
+      const userId = profile.user_id;
+      const studentName = profile.display_name || 'Student';
 
-      // Find user's attendance record for today
-      const userAttendance = todayAttendance?.find(a => a.user_id === userId);
-
-      // Get parent contact info
-      let profile = null;
-      if (userId) {
-        const { data } = await supabaseClient
-          .from('profiles')
-          .select('parent_email, parent_name')
-          .eq('user_id', userId)
-          .maybeSingle();
-        profile = data;
-      }
-
-      if (!profile?.parent_email) {
+      if (!profile.parent_email) {
         console.log(`No parent email for ${studentName}`);
         continue;
       }
+
+      // Find user's attendance record for today
+      const userAttendance = todayAttendance?.find(a => a.user_id === userId);
 
       let emailSubject = '';
       let emailBody = '';
