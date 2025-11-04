@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.75.0";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,12 +8,14 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-interface SMSRequest {
-  studentId?: string;
-  phoneNumber?: string;
-  message: string;
-  studentName?: string;
-}
+const smsSchema = z.object({
+  studentId: z.string().uuid().optional(),
+  phoneNumber: z.string().regex(/^\+?\d{10,15}$/).optional(),
+  message: z.string().min(1).max(1000),
+  studentName: z.string().max(100).optional()
+}).refine(data => data.studentId || data.phoneNumber, {
+  message: "Either studentId or phoneNumber must be provided"
+});
 
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
@@ -21,9 +24,23 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { studentId, phoneNumber, message, studentName }: SMSRequest = await req.json();
+    const requestBody = await req.json();
     
-    console.log("SMS Request received:", { studentId, phoneNumber, studentName });
+    // Validate input
+    const validationResult = smsSchema.safeParse(requestBody);
+    if (!validationResult.success) {
+      console.error("Validation error:", validationResult.error);
+      return new Response(
+        JSON.stringify({ error: "Invalid request data" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
+    
+    const { studentId, phoneNumber, message, studentName } = validationResult.data;
+    console.log("SMS Request received:", { hasStudentId: !!studentId, hasPhone: !!phoneNumber });
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -70,9 +87,9 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     if (!recipientPhone) {
-      console.error("No phone number found for student");
+      console.error("No phone number found");
       return new Response(
-        JSON.stringify({ error: "No phone number found for this student" }),
+        JSON.stringify({ error: "Unable to send SMS. Please contact support." }),
         {
           status: 400,
           headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -85,9 +102,9 @@ const handler = async (req: Request): Promise<Response> => {
     
     // Validate Indian phone number (10 digits)
     if (!/^\d{10}$/.test(cleanPhone)) {
-      console.error("Invalid phone number format:", cleanPhone);
+      console.error("Invalid phone number format");
       return new Response(
-        JSON.stringify({ error: "Invalid phone number format. Must be 10 digits for Indian numbers." }),
+        JSON.stringify({ error: "Invalid phone number format. Please contact support." }),
         {
           status: 400,
           headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -103,7 +120,7 @@ const handler = async (req: Request): Promise<Response> => {
     if (!fast2smsApiKey) {
       console.error("Fast2SMS API key not configured");
       return new Response(
-        JSON.stringify({ error: "SMS service not configured" }),
+        JSON.stringify({ error: "Service temporarily unavailable. Please contact support." }),
         {
           status: 500,
           headers: { "Content-Type": "application/json", ...corsHeaders },
@@ -125,8 +142,8 @@ const handler = async (req: Request): Promise<Response> => {
       console.error("Fast2SMS API Error:", smsData);
       return new Response(
         JSON.stringify({ 
-          error: "Failed to send SMS", 
-          details: smsData.message || "Unknown error" 
+          error: "Failed to send SMS. Please try again or contact support.",
+          support_id: crypto.randomUUID()
         }),
         {
           status: 500,
@@ -153,7 +170,10 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error in send-sms function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: "An error occurred. Please try again or contact support.",
+        support_id: crypto.randomUUID()
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

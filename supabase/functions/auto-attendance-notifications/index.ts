@@ -2,6 +2,17 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Resend } from "npm:resend@2.0.0"
 
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
 const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
 
 const corsHeaders = {
@@ -121,10 +132,10 @@ serve(async (req) => {
                     <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; border-left: 4px solid ${statusColor}; margin-bottom: 25px;">
                     <h2 style="color: #333; margin-top: 0; font-size: 20px;">Attendance Details</h2>
                     <div style="color: #555; line-height: 1.8; font-size: 16px;">
-                      <p style="margin: 10px 0;"><strong>Student:</strong> ${studentName}</p>
-                      <p style="margin: 10px 0;"><strong>Date:</strong> ${attendanceDate}</p>
-                      ${attendanceTime ? `<p style="margin: 10px 0;"><strong>Time:</strong> ${attendanceTime}</p>` : ''}
-                      <p style="margin: 10px 0;"><strong>Status:</strong> <span style="color: ${statusColor}; font-weight: bold;">${statusText}</span></p>
+                      <p style="margin: 10px 0;"><strong>Student:</strong> ${escapeHtml(studentName)}</p>
+                      <p style="margin: 10px 0;"><strong>Date:</strong> ${escapeHtml(attendanceDate)}</p>
+                      ${attendanceTime ? `<p style="margin: 10px 0;"><strong>Time:</strong> ${escapeHtml(attendanceTime)}</p>` : ''}
+                      <p style="margin: 10px 0;"><strong>Status:</strong> <span style="color: ${statusColor}; font-weight: bold;">${escapeHtml(statusText)}</span></p>
                     </div>
                   </div>
                   
@@ -177,8 +188,8 @@ serve(async (req) => {
     console.error('Error in auto-notifications:', error);
     return new Response(
       JSON.stringify({ 
-        error: 'Failed to process automatic notifications',
-        details: error.message 
+        error: 'Notification service error',
+        support_id: crypto.randomUUID()
       }),
       { 
         status: 500,

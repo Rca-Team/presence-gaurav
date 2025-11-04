@@ -76,8 +76,8 @@ const ParentContactForm: React.FC<ParentContactFormProps> = ({
     } catch (error) {
       console.error('Error saving contact information:', error);
       toast({
-        title: "Error",
-        description: "Failed to save contact information. Please try again.",
+        title: "Save Failed",
+        description: "Unable to save contact information. Please try again or contact support.",
         variant: "destructive",
       });
     } finally {

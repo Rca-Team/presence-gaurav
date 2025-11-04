@@ -128,7 +128,7 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
       console.error('Error sending notification:', error);
       toast({
         title: "Notification Failed",
-        description: "Failed to send notification. Please check parent contact information.",
+        description: "Unable to send notification. Please try again or contact support.",
         variant: "destructive",
       });
     } finally {
@@ -249,7 +249,7 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
       console.error('Error saving parent details:', error);
       toast({
         title: "Failed to Save",
-        description: error.message || "Could not save parent details. Please try again.",
+        description: "Unable to save contact details. Please try again or contact support.",
         variant: "destructive",
       });
     } finally {

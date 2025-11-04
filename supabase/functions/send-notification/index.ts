@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { Resend } from "npm:resend@2.0.0"
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts"
 
 console.log('Email notification function started');
 
@@ -13,6 +14,33 @@ console.log('Configuration check:', {
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+const notificationSchema = z.object({
+  recipient: z.object({
+    email: z.string().email().max(255),
+    name: z.string().max(100).optional()
+  }),
+  message: z.object({
+    subject: z.string().min(1).max(200),
+    body: z.string().min(1).max(5000)
+  }),
+  student: z.object({
+    id: z.string().uuid(),
+    name: z.string().max(100),
+    status: z.enum(['present', 'late', 'absent'])
+  }).optional()
+});
+
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+  return text.replace(/[&<>"']/g, m => map[m]);
 }
 
 serve(async (req) => {
@@ -71,21 +99,22 @@ serve(async (req) => {
     console.log('User authenticated and authorized:', user.id);
     
     const requestBody = await req.json();
-    console.log('Request body received:', JSON.stringify(requestBody, null, 2));
     
-    const { recipient, message, student } = requestBody;
-
-    // Validate required fields
-    if (!recipient || !message) {
-      console.error('Missing required fields:', { recipient: !!recipient, message: !!message });
-      throw new Error('Missing required fields: recipient and message are required');
+    // Validate input
+    const validationResult = notificationSchema.safeParse(requestBody);
+    if (!validationResult.success) {
+      console.error("Validation error:", validationResult.error);
+      return new Response(
+        JSON.stringify({ error: "Invalid request data" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
     }
-
-    // Email notification logic with Resend
-    if (!recipient.email) {
-      console.log('No email provided');
-      throw new Error('Email address is required for notifications');
-    }
+    
+    const { recipient, message, student } = validationResult.data;
+    console.log("Notification request:", { recipient: recipient.email, hasStudent: !!student });
     
     if (!Deno.env.get('RESEND_API_KEY')) {
       console.error('RESEND_API_KEY not configured');
@@ -111,15 +140,15 @@ serve(async (req) => {
             <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; border-left: 4px solid #667eea; margin: 20px 0;">
               <h2 style="color: #333; margin-top: 0;">Notification</h2>
               <div style="color: #555; line-height: 1.6; font-size: 16px;">
-                ${(message.body || '').replace(/\n/g, '<br>')}
+                ${escapeHtml(message.body || '').replace(/\n/g, '<br>')}
               </div>
             </div>
             
             ${student ? `
               <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e9ecef; margin: 20px 0;">
                 <h3 style="color: #333; margin-top: 0;">Student Information</h3>
-                <p style="margin: 5px 0;"><strong>Name:</strong> ${student.name}</p>
-                <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: ${student.status === 'present' ? '#28a745' : student.status === 'late' ? '#ffc107' : '#dc3545'}; font-weight: bold; text-transform: capitalize;">${student.status}</span></p>
+                <p style="margin: 5px 0;"><strong>Name:</strong> ${escapeHtml(student.name)}</p>
+                <p style="margin: 5px 0;"><strong>Status:</strong> <span style="color: ${student.status === 'present' ? '#28a745' : student.status === 'late' ? '#ffc107' : '#dc3545'}; font-weight: bold; text-transform: capitalize;">${escapeHtml(student.status)}</span></p>
               </div>
             ` : ''}
             
@@ -168,8 +197,8 @@ serve(async (req) => {
     console.error('Error sending notification:', error);
     return new Response(
       JSON.stringify({ 
-        error: 'Failed to send notification',
-        details: error.message 
+        error: 'Failed to send notification. Please try again or contact support.',
+        support_id: crypto.randomUUID()
       }),
       { 
         status: 500,
