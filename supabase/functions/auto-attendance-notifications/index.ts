@@ -72,21 +72,27 @@ serve(async (req) => {
       let emailSubject = '';
       let emailBody = '';
       let attendanceTime = '';
+      let attendanceDate = '';
 
       if (!userAttendance) {
         // Absent - no record for today
+        attendanceDate = new Date().toLocaleDateString();
         emailSubject = `Absence Alert - ${studentName}`;
-        emailBody = `Dear ${profile.parent_name || 'Parent/Guardian'},\n\nThis is to inform you that ${studentName} was marked absent today.\n\nDate: ${new Date().toLocaleDateString()}\n\nIf this is unexpected, please contact the school immediately.\n\nBest regards,\nSchool Administration`;
+        emailBody = `Dear ${profile.parent_name || 'Parent/Guardian'},\n\nThis is to inform you that ${studentName} was marked absent today.\n\nDate: ${attendanceDate}\n\nIf this is unexpected, please contact the school immediately.\n\nBest regards,\nSchool Administration`;
       } else if (userAttendance.status === 'late') {
-        // Late arrival
-        attendanceTime = new Date(userAttendance.timestamp).toLocaleTimeString();
+        // Late arrival - use actual timestamp from record
+        const recordTimestamp = new Date(userAttendance.timestamp);
+        attendanceTime = recordTimestamp.toLocaleTimeString();
+        attendanceDate = recordTimestamp.toLocaleDateString();
         emailSubject = `Late Arrival Notification - ${studentName}`;
-        emailBody = `Dear ${profile.parent_name || 'Parent/Guardian'},\n\nThis is to inform you that ${studentName} arrived late to school today.\n\nTime: ${attendanceTime}\nDate: ${new Date().toLocaleDateString()}\n\nPlease ensure punctuality in the future.\n\nBest regards,\nSchool Administration`;
+        emailBody = `Dear ${profile.parent_name || 'Parent/Guardian'},\n\nThis is to inform you that ${studentName} arrived late to school.\n\nTime: ${attendanceTime}\nDate: ${attendanceDate}\n\nPlease ensure punctuality in the future.\n\nBest regards,\nSchool Administration`;
       } else if (userAttendance.status === 'present') {
-        // Present - on time
-        attendanceTime = new Date(userAttendance.timestamp).toLocaleTimeString();
+        // Present - on time - use actual timestamp from record
+        const recordTimestamp = new Date(userAttendance.timestamp);
+        attendanceTime = recordTimestamp.toLocaleTimeString();
+        attendanceDate = recordTimestamp.toLocaleDateString();
         emailSubject = `Attendance Confirmation - ${studentName}`;
-        emailBody = `Dear ${profile.parent_name || 'Parent/Guardian'},\n\nThis is to inform you that ${studentName} has arrived at school safely today.\n\nTime: ${attendanceTime}\nDate: ${new Date().toLocaleDateString()}\n\nBest regards,\nSchool Administration`;
+        emailBody = `Dear ${profile.parent_name || 'Parent/Guardian'},\n\nThis is to inform you that ${studentName} has arrived at school safely.\n\nTime: ${attendanceTime}\nDate: ${attendanceDate}\n\nBest regards,\nSchool Administration`;
       }
 
       if (emailBody) {
@@ -112,11 +118,11 @@ serve(async (req) => {
                     </span>
                   </div>
                   
-                  <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; border-left: 4px solid ${statusColor}; margin-bottom: 25px;">
+                    <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; border-left: 4px solid ${statusColor}; margin-bottom: 25px;">
                     <h2 style="color: #333; margin-top: 0; font-size: 20px;">Attendance Details</h2>
                     <div style="color: #555; line-height: 1.8; font-size: 16px;">
                       <p style="margin: 10px 0;"><strong>Student:</strong> ${studentName}</p>
-                      <p style="margin: 10px 0;"><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+                      <p style="margin: 10px 0;"><strong>Date:</strong> ${attendanceDate}</p>
                       ${attendanceTime ? `<p style="margin: 10px 0;"><strong>Time:</strong> ${attendanceTime}</p>` : ''}
                       <p style="margin: 10px 0;"><strong>Status:</strong> <span style="color: ${statusColor}; font-weight: bold;">${statusText}</span></p>
                     </div>
