@@ -181,50 +181,63 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
 
     setIsLoading(true);
     try {
-      // First try to update by user_id
-      let { data, error } = await supabase
+      // First, check if profile exists by user_id
+      let { data: existingProfile } = await supabase
         .from('profiles')
-        .update({
-          parent_email: parentEmail.trim(),
-          parent_name: parentName.trim() || null
-        })
+        .select('id, user_id')
         .eq('user_id', studentId)
-        .select();
+        .maybeSingle();
 
-      // If no rows updated, try by id
-      if ((!data || data.length === 0) && !error) {
-        const result = await supabase
+      let result;
+      if (existingProfile) {
+        // Update existing profile
+        result = await supabase
           .from('profiles')
           .update({
             parent_email: parentEmail.trim(),
             parent_name: parentName.trim() || null
           })
-          .eq('id', studentId)
+          .eq('user_id', studentId)
           .select();
-        
-        data = result.data;
-        error = result.error;
-      }
-
-      // If still no match, create a new profile
-      if ((!data || data.length === 0) && !error) {
-        const insertResult = await supabase
+      } else {
+        // Check if profile exists by id
+        const { data: profileById } = await supabase
           .from('profiles')
-          .insert({
-            user_id: studentId,
-            display_name: studentName || 'Student',
-            parent_email: parentEmail.trim(),
-            parent_name: parentName.trim() || null
-          })
-          .select();
-        
-        data = insertResult.data;
-        error = insertResult.error;
+          .select('id, user_id')
+          .eq('id', studentId)
+          .maybeSingle();
+
+        if (profileById) {
+          // Update by id
+          result = await supabase
+            .from('profiles')
+            .update({
+              parent_email: parentEmail.trim(),
+              parent_name: parentName.trim() || null
+            })
+            .eq('id', studentId)
+            .select();
+        } else {
+          // Create new profile
+          result = await supabase
+            .from('profiles')
+            .insert({
+              user_id: studentId,
+              display_name: studentName || 'Student',
+              parent_email: parentEmail.trim(),
+              parent_name: parentName.trim() || null
+            })
+            .select();
+        }
       }
 
-      if (error) {
-        console.error('Database error:', error);
-        throw new Error(error.message);
+      if (result.error) {
+        console.error('Database error:', result.error);
+        throw new Error(result.error.message);
+      }
+
+      if (!result.data || result.data.length === 0) {
+        throw new Error('Failed to save parent details');
       }
 
       setHasParentEmail(true);
