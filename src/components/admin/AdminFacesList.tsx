@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 interface AdminFacesListProps {
   viewMode: 'grid' | 'list';
@@ -347,28 +348,21 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
                     </DropdownMenu>
                   </div>
                 </div>
-                  <div className="p-4 space-y-2">
+                   <div className="p-4 space-y-2">
                    <div className="flex justify-between items-start">
                      <h3 className="font-medium truncate">{face.name}</h3>
-                     <div className="ml-2 shrink-0">
-                       {face.image_url ? (
-                         <img 
-                           src={face.image_url.startsWith('data:') 
-                             ? face.image_url 
-                             : `https://zovwmlqnrsionbolcpng.supabase.co/storage/v1/object/public/face-images/${face.image_url}`
-                           } 
-                           alt={face.name} 
-                           className="h-8 w-8 rounded-full object-cover border-2 border-border"
-                           onError={(e) => {
-                             (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(face.name)}&background=random&size=32`;
-                           }}
-                         />
-                       ) : (
-                         <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center border-2 border-border">
-                           <User className="h-4 w-4 text-muted-foreground" />
-                         </div>
-                       )}
-                     </div>
+                     <Avatar className="ml-2 h-8 w-8 shrink-0 border-2 border-border">
+                       <AvatarImage 
+                         src={face.image_url?.startsWith('data:') 
+                           ? face.image_url 
+                           : `https://zovwmlqnrsionbolcpng.supabase.co/storage/v1/object/public/face-images/${face.image_url}`
+                         } 
+                         alt={face.name}
+                       />
+                       <AvatarFallback>
+                         <User className="h-4 w-4" />
+                       </AvatarFallback>
+                     </Avatar>
                    </div>
                    <p className="text-sm text-muted-foreground">{face.department}</p>
                     <div className="flex items-center justify-between pt-2 text-sm">
@@ -423,23 +417,18 @@ const AdminFacesList: React.FC<AdminFacesListProps> = ({
                     onClick={() => setSelectedFaceId(face.id === selectedFaceId ? null : face.id)}
                   >
                      <td className="py-3 px-4">
-                       {face.image_url ? (
-                         <img 
-                           src={face.image_url.startsWith('data:') 
+                       <Avatar className="h-10 w-10">
+                         <AvatarImage 
+                           src={face.image_url?.startsWith('data:') 
                              ? face.image_url 
                              : `https://zovwmlqnrsionbolcpng.supabase.co/storage/v1/object/public/face-images/${face.image_url}`
                            } 
-                           alt={face.name} 
-                           className="h-10 w-10 rounded-full object-cover"
-                           onError={(e) => {
-                             (e.target as HTMLImageElement).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(face.name)}&background=random&size=40`;
-                           }}
+                           alt={face.name}
                          />
-                       ) : (
-                         <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                           <User className="h-5 w-5 text-muted-foreground" />
-                         </div>
-                       )}
+                         <AvatarFallback>
+                           <User className="h-5 w-5" />
+                         </AvatarFallback>
+                       </Avatar>
                      </td>
                     <td className="py-3 px-4 font-medium">{face.name}</td>
                     <td className="py-3 px-4">{face.employee_id}</td>
