@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Mail } from 'lucide-react';
+import { Mail, AlertCircle, ExternalLink } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface NotificationServiceProps {
   studentId?: string;
@@ -24,6 +25,9 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
   const [message, setMessage] = useState('');
   const [subject, setSubject] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [hasParentEmail, setHasParentEmail] = useState(false);
+  const [parentEmail, setParentEmail] = useState('');
+  const [parentName, setParentName] = useState('');
 
   const getDefaultMessage = () => {
     const status = attendanceStatus?.toLowerCase();
@@ -122,12 +126,63 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
+    const checkParentDetails = async () => {
+      if (open && studentId) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('parent_email, parent_name')
+          .or(`user_id.eq.${studentId},id.eq.${studentId}`)
+          .maybeSingle();
+        
+        setHasParentEmail(!!(profile?.parent_email && profile.parent_email.trim() !== ''));
+        setParentEmail(profile?.parent_email || '');
+        setParentName(profile?.parent_name || '');
+      }
+    };
+
     if (open) {
       setMessage(getDefaultMessage());
       setSubject(getDefaultSubject());
+      checkParentDetails();
     }
-  }, [open, studentName, attendanceStatus]);
+  }, [open, studentName, attendanceStatus, studentId]);
+
+  const handleSaveParentDetails = async () => {
+    if (!studentId || !parentEmail.trim()) {
+      toast({
+        title: "Error",
+        description: "Parent email is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          parent_email: parentEmail.trim(),
+          parent_name: parentName.trim() || null
+        })
+        .or(`user_id.eq.${studentId},id.eq.${studentId}`);
+
+      if (error) throw error;
+
+      setHasParentEmail(true);
+      toast({
+        title: "Success",
+        description: "Parent details saved successfully",
+      });
+    } catch (error) {
+      console.error('Error saving parent details:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save parent details",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -144,6 +199,48 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
         </DialogHeader>
         
         <div className="space-y-4 pt-4">
+          {!hasParentEmail && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="ml-2">
+                <div className="space-y-2">
+                  <p className="font-medium">Parent email not found for this student</p>
+                  <p className="text-sm">Please add parent contact details to send notifications:</p>
+                  <div className="space-y-2 mt-3">
+                    <div>
+                      <Label htmlFor="parent_email" className="text-xs">Parent Email *</Label>
+                      <Input
+                        id="parent_email"
+                        type="email"
+                        value={parentEmail}
+                        onChange={(e) => setParentEmail(e.target.value)}
+                        placeholder="parent@example.com"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="parent_name" className="text-xs">Parent Name (Optional)</Label>
+                      <Input
+                        id="parent_name"
+                        value={parentName}
+                        onChange={(e) => setParentName(e.target.value)}
+                        placeholder="Parent's full name"
+                        className="mt-1"
+                      />
+                    </div>
+                    <Button 
+                      size="sm" 
+                      onClick={handleSaveParentDetails}
+                      className="w-full mt-2"
+                    >
+                      Save Parent Details
+                    </Button>
+                  </div>
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="subject">Email Subject</Label>
             <Input
@@ -174,7 +271,10 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
             <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={sendEmailNotification} disabled={isLoading}>
+            <Button 
+              onClick={sendEmailNotification} 
+              disabled={isLoading || !hasParentEmail}
+            >
               <Mail className="h-4 w-4 mr-2" />
               {isLoading ? "Sending..." : "Send Email"}
             </Button>
