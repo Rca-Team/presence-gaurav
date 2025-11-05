@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { descriptorToString, stringToDescriptor } from './ModelService';
+import { getAttendanceCutoffTime } from '../attendance/AttendanceSettingsService';
 
 interface Employee {
   id: string;
@@ -143,13 +144,23 @@ function calculateDistance(descriptor1: Float32Array, descriptor2: Float32Array)
   return Math.sqrt(sum);
 }
 
-// Check if current time is past cutoff time (default: 9:00 AM)
-function isPastCutoffTime(cutoffHour: number = 9, cutoffMinute: number = 0): boolean {
-  const now = new Date();
-  const cutoffTime = new Date();
-  cutoffTime.setHours(cutoffHour, cutoffMinute, 0, 0);
-  
-  return now > cutoffTime;
+// Check if current time is past cutoff time
+async function isPastCutoffTime(): Promise<boolean> {
+  try {
+    const cutoffTime = await getAttendanceCutoffTime();
+    const now = new Date();
+    const cutoffDate = new Date();
+    cutoffDate.setHours(cutoffTime.hour, cutoffTime.minute, 0, 0);
+    
+    return now > cutoffDate;
+  } catch (error) {
+    console.error('Error checking cutoff time, defaulting to 9:00 AM:', error);
+    // Fallback to 9:00 AM if there's an error
+    const now = new Date();
+    const cutoffDate = new Date();
+    cutoffDate.setHours(9, 0, 0, 0);
+    return now > cutoffDate;
+  }
 }
 
 export async function recordAttendance(
@@ -163,9 +174,14 @@ export async function recordAttendance(
     
     // Apply time-based status logic - if it's past cutoff time, mark as late
     let timeAdjustedStatus = status;
-    if (status === 'present' && isPastCutoffTime()) {
-      timeAdjustedStatus = 'late';
-      console.log('Adjusting status to late based on cutoff time');
+    if (status === 'present') {
+      const pastCutoff = await isPastCutoffTime();
+      if (pastCutoff) {
+        timeAdjustedStatus = 'late';
+        console.log('Adjusting status to late based on cutoff time');
+      } else {
+        console.log('Status remains present - before cutoff time');
+      }
     }
     
     // Normalize status to 'present' for universal compatibility
