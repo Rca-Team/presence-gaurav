@@ -18,7 +18,7 @@ interface NotificationServiceProps {
 const NotificationService: React.FC<NotificationServiceProps> = ({ 
   studentId, 
   studentName, 
-  attendanceStatus 
+  attendanceStatus: propAttendanceStatus
 }) => {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -28,9 +28,10 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
   const [hasParentEmail, setHasParentEmail] = useState(false);
   const [parentEmail, setParentEmail] = useState('');
   const [parentName, setParentName] = useState('');
+  const [actualStatus, setActualStatus] = useState<string>('absent');
 
   const getDefaultMessage = () => {
-    const status = attendanceStatus?.toLowerCase();
+    const status = actualStatus?.toLowerCase();
     if (status === 'present') {
       return `Dear Parent/Guardian,\n\nThis is to inform you that ${studentName} has arrived at school safely today.\n\nTime: ${new Date().toLocaleTimeString()}\nDate: ${new Date().toLocaleDateString()}\n\nBest regards,\nSchool Administration`;
     } else if (status === 'late') {
@@ -109,7 +110,7 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
           student: {
             id: studentId,
             name: studentName,
-            status: attendanceStatus
+            status: actualStatus
           }
         }
       });
@@ -137,16 +138,15 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
   };
 
   useEffect(() => {
-    const checkParentDetails = async () => {
+    const checkParentDetailsAndStatus = async () => {
       if (open && studentId) {
-        // Try to get profile by user_id first, then by id
+        // Check parent details
         let { data: profile } = await supabase
           .from('profiles')
           .select('parent_email, parent_name')
           .eq('user_id', studentId)
           .maybeSingle();
 
-        // If not found, try by id
         if (!profile) {
           const result = await supabase
             .from('profiles')
@@ -159,15 +159,37 @@ const NotificationService: React.FC<NotificationServiceProps> = ({
         setHasParentEmail(!!(profile?.parent_email && profile.parent_email.trim() !== ''));
         setParentEmail(profile?.parent_email || '');
         setParentName(profile?.parent_name || '');
+
+        // Fetch actual attendance status for today
+        const today = new Date().toISOString().split('T')[0];
+        const { data: attendanceRecord } = await supabase
+          .from('attendance_records')
+          .select('status')
+          .eq('user_id', studentId)
+          .gte('timestamp', `${today}T00:00:00`)
+          .lte('timestamp', `${today}T23:59:59`)
+          .order('timestamp', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        // Set actual status: use database record if exists, otherwise absent
+        const detectedStatus = attendanceRecord?.status || 'absent';
+        setActualStatus(detectedStatus);
       }
     };
 
     if (open) {
+      checkParentDetailsAndStatus();
+    }
+  }, [open, studentId]);
+
+  // Update message and subject when status changes
+  useEffect(() => {
+    if (open) {
       setMessage(getDefaultMessage());
       setSubject(getDefaultSubject());
-      checkParentDetails();
     }
-  }, [open, studentName, attendanceStatus, studentId]);
+  }, [open, actualStatus, studentName]);
 
   const handleSaveParentDetails = async () => {
     if (!studentId || !parentEmail.trim()) {
