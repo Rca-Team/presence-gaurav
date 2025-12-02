@@ -1,16 +1,14 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { OptimizedFaceRecognitionResult } from '@/hooks/useOptimizedFaceRecognition';
 import { Clock, UserCheck, AlertTriangle } from 'lucide-react';
 
 interface AttendanceResultProps {
-  result: OptimizedFaceRecognitionResult;
+  result: any; // Simplified for now since we're no longer using the specific type
   resetResult: () => void;
 }
 
 const AttendanceResult: React.FC<AttendanceResultProps> = ({ result, resetResult }) => {
-  // Extract data from the optimized result structure
+  // Extract data from the result structure
   let status: 'present' | 'late' | 'unauthorized' = 'unauthorized';
   let employee: any = null;
   let recognized = false;
@@ -24,7 +22,7 @@ const AttendanceResult: React.FC<AttendanceResultProps> = ({ result, resetResult
     if (firstRecognized.recognition) {
       employee = firstRecognized.recognition.employee;
       recognized = firstRecognized.recognition.recognized;
-      status = 'present'; // Default for multiple face recognition
+      status = 'present';
     }
   }
 

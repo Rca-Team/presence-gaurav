@@ -1,25 +1,15 @@
+// Re-export storage functions (using correct names)
+export {
+  uploadImage as uploadFaceImage
+} from './face-recognition/StorageService';
 
-// Re-export all functions from our modular services
-export { 
-  loadModels, 
-  getFaceDescriptor,
-  descriptorToString,
-  stringToDescriptor,
-  areModelsLoaded,
-  forceReloadModels
-} from './face-recognition/ModelService';
-
+// Re-export registration functions  
 export {
   registerFace,
-  storeUnrecognizedFace,
-  uploadFaceImage
+  storeUnrecognizedFace
 } from './face-recognition/RegistrationService';
 
-export {
-  recognizeFace,
-  recordAttendance
-} from './face-recognition/RecognitionService';
-
+// Re-export attendance settings
 export {
   getCutoffTime,
   updateCutoffTime,

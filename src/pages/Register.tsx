@@ -15,8 +15,9 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { loadModels, getFaceDescriptor, registerFace } from '@/services/FaceRecognitionService';
+import { registerFace } from '@/services/FaceRecognitionService';
 import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
 
 const Register = () => {
   const { toast } = useToast();
@@ -37,33 +38,9 @@ const Register = () => {
     startingYear: '',
   });
   const [faceImage, setFaceImage] = useState<string | null>(null);
-  const [faceDescriptor, setFaceDescriptor] = useState<Float32Array | null>(null);
   const [registrationStep, setRegistrationStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isModelLoading, setIsModelLoading] = useState(true);
   const [faceCaptured, setFaceCaptured] = useState(false);
-
-  useEffect(() => {
-    const initializeModels = async () => {
-      try {
-        console.log('Starting model initialization');
-        setIsModelLoading(true);
-        await loadModels();
-        console.log('Models loaded successfully');
-        setIsModelLoading(false);
-      } catch (error) {
-        console.error('Error loading face recognition models:', error);
-        toast({
-          title: "Error Loading Models",
-          description: "Failed to load face recognition models. Please check console for details.",
-          variant: "destructive",
-        });
-        setIsModelLoading(false);
-      }
-    };
-    
-    initializeModels();
-  }, [toast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -75,24 +52,14 @@ const Register = () => {
   };
 
   const handleCaptureImage = async (imageData: string) => {
-    if (!webcamRef.current || isModelLoading) return;
-    
     try {
-      console.log('Attempting to capture face');
-      // Get face descriptor from webcam
-      const descriptor = await getFaceDescriptor(webcamRef.current);
+      console.log('Capturing face image');
       
-      if (!descriptor) {
-        toast({
-          title: "Face Detection Failed",
-          description: "No face detected. Please ensure your face is clearly visible.",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Send image to backend for face embedding extraction
+      const response = await fetch(imageData);
+      const blob = await response.blob();
       
       setFaceImage(imageData);
-      setFaceDescriptor(descriptor);
       setFaceCaptured(true);
       
       toast({
@@ -113,7 +80,7 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!faceDescriptor || !faceCaptured || !faceImage) {
+    if (!faceCaptured || !faceImage) {
       toast({
         title: "Missing face image",
         description: "Please capture your face before submitting",
@@ -136,6 +103,23 @@ const Register = () => {
       const response = await fetch(faceImage);
       const imageBlob = await response.blob();
       
+      // Send image to backend to get face embedding
+      const { data: embeddingData, error: embeddingError } = await supabase.functions.invoke(
+        'face-recognition-arcface',
+        {
+          body: {
+            imageData: faceImage,
+            faces: [{ id: 'registration', boundingBox: { originX: 0, originY: 0, width: 100, height: 100 } }]
+          }
+        }
+      );
+
+      if (embeddingError || !embeddingData?.results?.[0]?.embedding) {
+        throw new Error('Failed to extract face embedding');
+      }
+
+      const faceEmbedding = new Float32Array(embeddingData.results[0].embedding);
+      
       // Register face with our service including parent contact info
       const registrationData = await registerFace(
         imageBlob,
@@ -144,7 +128,7 @@ const Register = () => {
         formData.department,
         formData.position || '',
         userId,
-        faceDescriptor, // Pass the face descriptor to the registration function
+        faceEmbedding,
         {
           phone: formData.phone,
           parent_name: formData.parentName,
@@ -177,7 +161,6 @@ const Register = () => {
           startingYear: '',
         });
         setFaceImage(null);
-        setFaceDescriptor(null);
         setFaceCaptured(false);
         setRegistrationStep(1);
       } else {
@@ -435,21 +418,15 @@ const Register = () => {
                     Please look directly at the camera and ensure your face is clearly visible.
                   </p>
                   
-                  {isModelLoading ? (
-                    <div className="flex flex-col items-center py-6">
-                      <div className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent animate-spin mb-2"></div>
-                      <p className="text-muted-foreground">Loading face recognition models...</p>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center">
-                      <Webcam
-                        ref={webcamRef}
-                        onCapture={handleCaptureImage}
-                        className="max-w-md w-full"
-                        overlayClassName={faceCaptured ? "border-green-500" : ""}
-                      />
-                      
-                      {faceCaptured ? (
+                  <div className="flex flex-col items-center">
+                    <Webcam
+                      ref={webcamRef}
+                      onCapture={handleCaptureImage}
+                      className="max-w-md w-full"
+                      overlayClassName={faceCaptured ? "border-green-500" : ""}
+                    />
+                    
+                    {faceCaptured ? (
                         <div className="mt-4 text-center">
                           <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-500 text-sm">
                             <svg
@@ -488,8 +465,7 @@ const Register = () => {
                           </p>
                         </div>
                       )}
-                    </div>
-                  )}
+                  </div>
                 </div>
               </Card>
               
@@ -504,7 +480,7 @@ const Register = () => {
                 
                 <Button 
                   type="submit" 
-                  disabled={isSubmitting || !faceCaptured || isModelLoading}
+                  disabled={isSubmitting || !faceCaptured}
                 >
                   {isSubmitting ? (
                     <>
