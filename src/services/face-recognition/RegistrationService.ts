@@ -1,8 +1,6 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { uploadImage } from './StorageService';
 import { v4 as uuidv4 } from 'uuid';
-import { descriptorToString } from './ModelService';
 
 // Define an interface for the metadata to ensure type safety
 export interface RegistrationMetadata {
@@ -11,7 +9,7 @@ export interface RegistrationMetadata {
   department: string;
   position: string;
   firebase_image_url: string;
-  faceDescriptor?: string; // Make this optional since it's added conditionally
+  faceDescriptor?: string;
 }
 
 export const registerFace = async (
@@ -45,22 +43,16 @@ export const registerFace = async (
       throw new Error('Invalid image: The image blob is empty or invalid');
     }
     
-    if (!faceDescriptor) {
-      console.warn('No face descriptor provided for registration. This may limit face recognition capabilities.');
-    }
-    
     // Create a proper File object from the blob
     const uniqueId = uuidv4();
     const file = new File([imageBlob], `face_${uniqueId}.jpg`, { type: 'image/jpeg' });
     
-    // Generate a unique file path - simplified to avoid path issues
     const filePath = `${uniqueId}.jpg`;
     console.log('Uploading with path:', filePath);
     
-    // Try to upload the image to storage or use base64 as fallback
+    // Upload the image to storage or use base64 as fallback
     let imageUrl;
     try {
-      // Using only the 'public' bucket to avoid permission issues
       imageUrl = await uploadImage(file, filePath);
       console.log('Face image uploaded successfully:', imageUrl);
     } catch (uploadError) {
@@ -78,7 +70,13 @@ export const registerFace = async (
       console.log('Image stored as base64 (fallback method)');
     }
     
-    // Prepare metadata as a plain object that conforms to Json type
+    // Convert face descriptor to JSON string if provided
+    if (faceDescriptor) {
+      faceDescriptorString = JSON.stringify(Array.from(faceDescriptor));
+      console.log('Descriptor converted to JSON string');
+    }
+    
+    // Prepare metadata
     const metadata: Record<string, any> = {
       name,
       employee_id,
@@ -88,15 +86,13 @@ export const registerFace = async (
     };
 
     if (faceDescriptor) {
-      faceDescriptorString = descriptorToString(faceDescriptor);
-      console.log('Descriptor converted to string, length:', faceDescriptorString.length);
       metadata.faceDescriptor = faceDescriptorString;
     }
     
-    // Create device info as a plain object that conforms to Json type
+    // Create device info
     const deviceInfo: Record<string, any> = {
       type: 'webcam',
-      registration: 'true', // Must be string for RLS policy check
+      registration: 'true',
       metadata: {
         ...metadata,
         ...parentContactInfo
@@ -106,14 +102,13 @@ export const registerFace = async (
 
     console.log('Inserting attendance record with metadata');
     
-    // Use a valid user ID or generate a new one
     const effectiveUserId = userId || uuidv4();
     console.log('Using user ID:', effectiveUserId);
     
     // Check if user is authenticated
     const { data: { user } } = await supabase.auth.getUser();
     
-    // Insert registration record with proper authentication context
+    // Insert registration record
     const insertData = {
       user_id: effectiveUserId,
       timestamp: new Date().toISOString(),
@@ -123,25 +118,23 @@ export const registerFace = async (
       face_descriptor: faceDescriptorString
     };
 
-    // Try to insert with current auth context
     let { data: recordData, error: recordError } = await supabase
       .from('attendance_records')
       .insert(insertData)
       .select()
       .single();
 
-    // If RLS blocks it, try with anon access (for public registration)
+    // If RLS blocks it, try with public registration
     if (recordError && recordError.code === '42501') {
       console.log('RLS blocked insert, attempting public registration...');
       
-      // Create a simplified record for public registration
       const publicInsertData = {
-        user_id: null, // Use null for public registrations
+        user_id: null,
         timestamp: new Date().toISOString(),
-        status: 'pending_approval' as const, // Status that allows public registration
+        status: 'pending_approval' as const,
         device_info: {
           type: 'webcam',
-          registration: 'true', // Must be string for RLS policy
+          registration: 'true',
           metadata: deviceInfo.metadata,
           timestamp: deviceInfo.timestamp
         },
@@ -176,19 +169,16 @@ export const uploadFaceImage = async (imageBlob: Blob): Promise<string> => {
   try {
     console.log('Starting face image upload, blob size:', imageBlob.size);
     
-    // Validate the blob
     if (!imageBlob || imageBlob.size === 0) {
       throw new Error('Invalid image: The image blob is empty or invalid');
     }
     
-    // Create a unique filename
     const uniqueId = uuidv4();
     const file = new File([imageBlob], `face_${uniqueId}.jpg`, { type: 'image/jpeg' });
     const filePath = `${uniqueId}.jpg`;
     
     console.log('Uploading image as:', filePath);
     
-    // Use our storage service upload function with 'public' bucket only
     const publicUrl = await uploadImage(file, filePath);
     console.log('Image uploaded successfully:', publicUrl);
     return publicUrl;
@@ -203,7 +193,6 @@ export const storeUnrecognizedFace = async (imageData: string): Promise<void> =>
   try {
     console.log('Storing unrecognized face');
     
-    // Convert base64 image data to a Blob
     const response = await fetch(imageData);
     const blob = await response.blob();
     
@@ -212,16 +201,14 @@ export const storeUnrecognizedFace = async (imageData: string): Promise<void> =>
       return;
     }
     
-    // Upload the image or use base64 as fallback
     let imageUrl;
     try {
       imageUrl = await uploadFaceImage(blob);
     } catch (uploadError) {
       console.warn('Failed to upload unrecognized face, using base64 instead:', uploadError);
-      imageUrl = imageData; // Use original base64 data
+      imageUrl = imageData;
     }
     
-    // Create a device info object with the current timestamp as a plain object
     const deviceInfo: Record<string, any> = {
       type: 'webcam',
       userAgent: navigator.userAgent,
@@ -229,11 +216,10 @@ export const storeUnrecognizedFace = async (imageData: string): Promise<void> =>
       firebase_image_url: imageUrl,
     };
     
-    // Insert a record with status "unauthorized"
     const { error } = await supabase
       .from('attendance_records')
       .insert({
-        user_id: null, // No user associated
+        user_id: null,
         status: 'unauthorized',
         device_info: deviceInfo,
         image_url: imageUrl,
